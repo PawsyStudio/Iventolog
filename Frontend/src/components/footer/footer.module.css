@@ -1,0 +1,10 @@
+.footer {
+    width: 100%;
+    height: 118px;
+    background: linear-gradient(to right, #125699, #1E90FF);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    filter: drop-shadow(0 -7px 0 #1E90FF);
+    padding: 20px 50px; /*переделать и настроить соотношение расположения в подвале */
+}
