@@ -1,12 +1,12 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import type { ReactNode } from 'react';
 import { useRouter } from '@tanstack/react-router';
+import type { ReactNode } from 'react';
 
 interface AuthContextType {
   isAuth: boolean;
   token: string | null;
   login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
+  logout: () => Promise<void>;
   authError: string | null;
   isLoading: boolean;
 }
@@ -14,24 +14,29 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuth, setIsAuth] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
-  const [authError, setAuthError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const [state, setState] = useState({
+    isAuth: false,
+    token: null as string | null,
+    authError: null as string | null,
+    isLoading: false
+  });
 
-  // Инициализация состояния аутентификации
+  // Инициализация при загрузке
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    if (storedToken) {
-      setToken(storedToken);
-      setIsAuth(true);
+    const token = localStorage.getItem('token');
+    if (token) {
+      setState({
+        isAuth: true,
+        token,
+        authError: null,
+        isLoading: false
+      });
     }
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
-    setIsLoading(true);
-    setAuthError(null);
+  const login = async (email: string, password: string) => {
+    setState(prev => ({ ...prev, isLoading: true, authError: null }));
     
     try {
       const response = await fetch('http://localhost:8000/api/auth/', {
@@ -39,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || 'Login failed');
@@ -47,39 +52,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const data = await response.json();
       localStorage.setItem('token', data.access);
-      setToken(data.access);
-      setIsAuth(true);
-      setIsLoading(false);
       
-      // Перенаправление после успешного входа
-      router.navigate({ to: '/' });
+      setState({
+        isAuth: true,
+        token: data.access,
+        authError: null,
+        isLoading: false
+      });
+
+      await router.navigate({ to: '/' });
       return true;
     } catch (error) {
-      console.error('Login error:', error);
-      setAuthError(error instanceof Error ? error.message : 'Login failed');
-      setIsLoading(false);
+      const errorMessage = error instanceof Error ? error.message : 'Login failed';
+      setState(prev => ({
+        ...prev,
+        authError: errorMessage,
+        isLoading: false
+      }));
       return false;
     }
-  }, [router]);
+  };
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
     localStorage.removeItem('token');
-    setToken(null);
-    setIsAuth(false);
-    setAuthError(null);
-    
-    // Перенаправление после выхода
-    router.navigate({ to: '/auth' });
+    setState({
+      isAuth: false,
+      token: null,
+      authError: null,
+      isLoading: false
+    });
+    await router.navigate({ to: '/auth' });
   }, [router]);
 
   return (
-    <AuthContext.Provider value={{ 
-      isAuth, 
-      token,
-      login, 
+    <AuthContext.Provider value={{
+      isAuth: state.isAuth,
+      token: state.token,
+      login,
       logout,
-      authError,
-      isLoading
+      authError: state.authError,
+      isLoading: state.isLoading
     }}>
       {children}
     </AuthContext.Provider>

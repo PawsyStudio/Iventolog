@@ -1,21 +1,22 @@
-import styles from './logoutButton.module.css';
+import styles from './LogoutButton.module.css';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function LogoutButton() {
-  const { logout } = useAuth();
+  const { logout, isLoading } = useAuth();
 
-  const handleLogout = () => {
-    logout();
-    // Дополнительные действия при выходе (если нужны)
+  const handleLogout = async () => {
+    if (window.confirm('Вы уверены, что хотите выйти?')) {
+      await logout();
+    }
   };
 
   return (
-    <button 
+    <button
       className={styles.LogoutButton}
       onClick={handleLogout}
-      aria-label="Выйти из аккаунта"
+      disabled={isLoading}
     >
-      Выйти
+      {isLoading ? 'Выход...' : 'Выйти'}
     </button>
   );
 }
