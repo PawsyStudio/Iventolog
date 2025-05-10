@@ -1,12 +1,13 @@
-import Footer from '../components/footer/Footer'
+import Footer from '../components/footer/Footer';
+import { CreateEventForm } from '../components/CreateEventForm';
 
 export function Create() {
-    return (
-      <>
-        <main>
-        <h1>Это Create</h1>
-        </main>
-        <Footer />
-      </>
-    );
-  }
+  return (
+    <>
+      <main>
+        <CreateEventForm />
+      </main>
+      <Footer />
+    </>
+  );
+}

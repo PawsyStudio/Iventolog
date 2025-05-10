@@ -1,16 +1,18 @@
+import { useRouter } from '@tanstack/react-router';
+import styles from './CreateButton.module.css';
 import { useAuth } from '../../../contexts/AuthContext';
-import { useNavigate } from '@tanstack/react-router';
-import styles from './createButton.module.css';
 
 export default function CreateButton() {
   const { isAuth } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
-  const handleClick = () => {
-    if (isAuth) {
-      navigate({ to: '/create' }); // Переход на страницу создания
-    } else {
-      navigate({ to: '/auth' }); // Переход на авторизацию
+  const handleClick = async () => {
+    try {
+      await router.navigate({ 
+        to: isAuth ? '/create' : '/auth'
+      });
+    } catch (error) {
+      console.error('Navigation error:', error);
     }
   };
 
