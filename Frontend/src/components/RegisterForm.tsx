@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from '@tanstack/react-router';
 import styles from './AuthForms.module.css';
+import { useAuthStore } from '@/store/AuthStore';
 
 export function RegisterForm() {
   const [email, setEmail] = useState('');
@@ -9,7 +9,7 @@ export function RegisterForm() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const login = useAuthStore(state => state.login);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +40,7 @@ export function RegisterForm() {
       }
 
       // 3. Редирект на главную
-      navigate({ to: '/' });
+      navigate({ to: '/create' });
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка соединения');

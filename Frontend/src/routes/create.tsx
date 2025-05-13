@@ -4,8 +4,12 @@ import { Create } from '../pages/Create';
 export const Route = createFileRoute('/create')({
   component: Create,
   beforeLoad: ({ context }) => {
-    if (!context.auth.isAuth) {
+    console.log('Дед 1', context.isAuth);
+    
+    if (!context.isAuth) {
       throw redirect({ to: '/auth' });
     }
+
+    console.log('Дед 2', context.isAuth);
   },
 });

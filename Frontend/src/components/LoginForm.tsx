@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from '@tanstack/react-router';
 import styles from './AuthForms.module.css';
+import { useAuthStore } from '@/store/AuthStore';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const login = useAuthStore(state => state.login);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -15,11 +15,10 @@ export function LoginForm() {
     setError('');
     
     try {
-      // Заглушка (замените на реальный запрос)
       const isSuccess = await login(email, password);
       
       if (isSuccess) {
-        navigate({ to: '/' });
+        navigate({ to: '/create' });
       } else {
         setError('Неверный email или пароль');
       }
