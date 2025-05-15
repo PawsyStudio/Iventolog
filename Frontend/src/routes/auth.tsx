@@ -4,7 +4,9 @@ import { Auth } from '../pages/Auth';
 export const Route = createFileRoute('/auth')({
   component: Auth,
   beforeLoad: ({ context }) => {
-    if (context.auth.isAuth) {
+
+    console.log('Баба Яга 1', context.isAuth);
+    if (context.isAuth) {
       throw redirect({ to: '/' });
     }
   },
