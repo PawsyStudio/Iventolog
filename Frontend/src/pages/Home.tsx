@@ -1,4 +1,4 @@
-import Header from '../components/headPack/header/Header'
+import Header from '../components/headPack/homeHeader/HomeHeader'
 import Footer from '../components/footer/Footer'
 import LogoutButton from '../components/logoutButton/LogoutButton'
 

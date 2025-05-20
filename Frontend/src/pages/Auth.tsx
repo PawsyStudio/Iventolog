@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { LoginForm } from '../components/LoginForm';
 import { RegisterForm } from '../components/RegisterForm';
+import Header from '../components/headPack/appHeader/AppHeader'
 import Footer from '../components/footer/Footer'
 import styles from '../components/AuthForms.module.css';
 
@@ -9,6 +10,7 @@ export function Auth() {
 
   return (
     <>
+      <Header />
       <div className={styles.authPage}>
         <div className={styles.tabs}>
           <button
