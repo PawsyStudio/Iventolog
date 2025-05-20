@@ -1,5 +1,11 @@
+/* src/styles.css */
 @import "tailwindcss";
+
+/* Импортируем файл со шрифтами */
+@import "./fonts.css";
+
 body {
-	background-color:red;
-	line-height: auto;
+  font-family: 'Unbounded', sans-serif;
+  background-color: red;
+  line-height: auto;
 }

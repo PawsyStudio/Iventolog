@@ -8,26 +8,28 @@ export function Auth() {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
 
   return (
-    <div className={styles.authPage}>
-      <div className={styles.tabs}>
-        <button
-          className={`${styles.tabButton} ${activeTab === 'login' ? styles.active : ''}`}
-          onClick={() => setActiveTab('login')}
-        >
-          Войти
-        </button>
-        <button
-          className={`${styles.tabButton} ${activeTab === 'register' ? styles.active : ''}`}
-          onClick={() => setActiveTab('register')}
-        >
-          Регистрация
-        </button>
-      </div>
+    <>
+      <div className={styles.authPage}>
+        <div className={styles.tabs}>
+          <button
+            className={`${styles.tabButton} ${activeTab === 'login' ? styles.active : ''}`}
+            onClick={() => setActiveTab('login')}
+          >
+            Войти
+          </button>
+          <button
+            className={`${styles.tabButton} ${activeTab === 'register' ? styles.active : ''}`}
+            onClick={() => setActiveTab('register')}
+          >
+            Регистрация
+          </button>
+        </div>
 
-      <div className={styles.formContainer}>
-        {activeTab === 'login' ? <LoginForm /> : <RegisterForm />}
+        <div className={styles.formContainer}>
+          {activeTab === 'login' ? <LoginForm /> : <RegisterForm />}
+        </div>
       </div>
       <Footer />
-    </div>
+    </>
   );
 }
