@@ -5,6 +5,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from .serializers import UserRegisterSerializer, UserLoginSerializer
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.renderers import JSONRenderer
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 class CheckAuthAPI(APIView):
     permission_classes = [IsAuthenticated]
@@ -12,7 +15,9 @@ class CheckAuthAPI(APIView):
     def get(self, request):
         return Response({'message': 'Authenticated'}, status=status.HTTP_200_OK)
 
+
 class RegisterAPI(APIView):
+    renderer_classes = [JSONRenderer]  # Явно указываем JSON-рендерер
     def post(self, request):
         serializer = UserRegisterSerializer(data=request.data)
         if serializer.is_valid():
