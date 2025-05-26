@@ -81,7 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       authError: null,
       isLoading: false
     });
-    await router.navigate({ to: '/auth' });
+    await router.navigate({ to: '/' });
   }, [router]);
 
   return (
