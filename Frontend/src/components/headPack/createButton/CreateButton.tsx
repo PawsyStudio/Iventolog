@@ -14,7 +14,7 @@ export default function CreateButton() {
 
   return (
     <Link 
-      to='/create'
+      to='/events'
       className={styles.CreateButton}
       onClick={handleClick}
     >

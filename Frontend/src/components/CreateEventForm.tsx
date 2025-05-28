@@ -1,18 +1,23 @@
 import { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
 import styles from './CreateEventForm.module.css';
 
 interface CreateEventFormProps {
   onSuccess?: () => void;
   onError?: (error: string) => void;
+  onCancel?: () => void;
 }
 
-export function CreateEventForm({ onSuccess, onError }: CreateEventFormProps) {
-  const [eventName, setEventName] = useState('');
-  const [budgetType, setBudgetType] = useState<'solo' | 'group'>('solo');
+export function CreateEventForm({ onSuccess, onError, onCancel }: CreateEventFormProps) {
+  const [formData, setFormData] = useState({
+    title: '',
+    budget_type: 'SOLO' as 'SOLO' | 'GROUP',
+    venue_type: 'OWN' as 'OWN' | 'RENTED',
+    venue_cost: '' as string | null,
+    event_date: '',
+  });
+
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,9 +26,19 @@ export function CreateEventForm({ onSuccess, onError }: CreateEventFormProps) {
 
     try {
       const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Необходима авторизация');
+      if (!token) throw new Error('Необходима авторизация');
+
+      if (formData.venue_type === 'RENTED' && !formData.venue_cost) {
+        throw new Error('Укажите стоимость аренды');
       }
+
+      const payload = {
+        title: formData.title,
+        budget_type: formData.budget_type,
+        venue_type: formData.venue_type,
+        venue_cost: formData.venue_type === 'RENTED' ? Number(formData.venue_cost) : null,
+        event_date: formData.event_date,
+      };
 
       const response = await fetch('http://localhost:8000/api/events/', {
         method: 'POST',
@@ -31,10 +46,7 @@ export function CreateEventForm({ onSuccess, onError }: CreateEventFormProps) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ 
-          name: eventName,
-          budget_type: budgetType 
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -42,60 +54,113 @@ export function CreateEventForm({ onSuccess, onError }: CreateEventFormProps) {
         throw new Error(errorData.detail || 'Ошибка создания мероприятия');
       }
 
-      // Вызываем колбэк при успехе, если он передан
-      if (onSuccess) {
-        onSuccess();
-      } else {
-        // Иначе делаем стандартный редирект
-        navigate({ to: '/' });
-      }
+      onSuccess?.();
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Ошибка соединения';
       setError(errorMessage);
-      if (onError) {
-        onError(errorMessage);
-      }
+      onError?.(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleChange = (field: string, value: string | boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
   return (
     <form onSubmit={handleSubmit} className={styles.createForm}>
-      <h2>Создать мероприятие</h2>
-      
+      <h2 className={styles.title}>Создать мероприятие</h2>
+
       <div className={styles.formGroup}>
-        <label>Название мероприятия</label>
+        <label className={styles.label}>Название мероприятия *</label>
         <input
           type="text"
-          value={eventName}
-          onChange={(e) => setEventName(e.target.value)}
+          className={styles.input}
+          value={formData.title}
+          onChange={(e) => handleChange('title', e.target.value)}
           required
           maxLength={100}
         />
       </div>
 
       <div className={styles.formGroup}>
-        <label>Тип бюджета</label>
+        <label className={styles.label}>Тип бюджета *</label>
         <select
-          value={budgetType}
-          onChange={(e) => setBudgetType(e.target.value as 'solo' | 'group')}
+          className={styles.select}
+          value={formData.budget_type}
+          onChange={(e) => handleChange('budget_type', e.target.value as 'SOLO' | 'GROUP')}
           required
         >
-          <option value="solo">Соло</option>
-          <option value="group">Групповой</option>
+          <option value="SOLO">Соло</option>
+          <option value="GROUP">Групповой</option>
         </select>
+      </div>
+
+      <div className={styles.formGroup}>
+        <label className={styles.label}>Тип места проведения *</label>
+        <select
+          className={styles.select}
+          value={formData.venue_type}
+          onChange={(e) => handleChange('venue_type', e.target.value as 'OWN' | 'RENTED')}
+          required
+        >
+          <option value="OWN">Своё помещение</option>
+          <option value="RENTED">Аренда</option>
+        </select>
+      </div>
+
+      {formData.venue_type === 'RENTED' && (
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Стоимость аренды *</label>
+          <input
+            type="number"
+            className={styles.input}
+            min="0"
+            step="100"
+            value={formData.venue_cost || ''}
+            onChange={(e) => handleChange('venue_cost', e.target.value)}
+            required
+          />
+        </div>
+      )}
+
+      <div className={styles.formGroup}>
+        <label className={styles.label}>Дата и время проведения *</label>
+        <input
+          type="datetime-local"
+          className={styles.input}
+          value={formData.event_date}
+          onChange={(e) => handleChange('event_date', e.target.value)}
+          required
+        />
       </div>
 
       {error && <div className={styles.error}>{error}</div>}
 
-      <button 
-        type="submit" 
-        className={styles.submitButton}
-        disabled={isLoading}
-      >
-        {isLoading ? 'Создание...' : 'Создать мероприятие'}
-      </button>
+      <div className={styles.buttonGroup}>
+        {onCancel && (
+          <button
+            type="button"
+            className={styles.cancelButton}
+            onClick={onCancel}
+            disabled={isLoading}
+          >
+            Отмена
+          </button>
+        )}
+        
+        <button 
+          type="submit" 
+          className={styles.submitButton}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Создание...' : 'Создать мероприятие'}
+        </button>
+      </div>
     </form>
   );
 }
