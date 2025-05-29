@@ -32,7 +32,7 @@ export function Home() {
           initialTab={authModal.tab}
           isOpen={authModal.isOpen}
           onSuccess={() => {
-            navigate({ to: '/create' });
+            navigate({ to: '/events' });
             hideAuthModal();
           }}
           onClose={() => {
