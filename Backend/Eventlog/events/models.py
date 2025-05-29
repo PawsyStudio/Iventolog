@@ -1,21 +1,49 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.validators import RegexValidator
+
 
 User = get_user_model()
 
 class Event(models.Model):
     BUDGET_TYPES = [
-        ('solo', 'Соло'),
-        ('group', 'Групповой'), 
+        ('SOLO', 'Соло'),
+        ('GROUP', 'Групповой'), 
     ]
+
+    PLACES = [
+        ('OWN','Своё'),
+        ('RENTED','Аренда'),
+    ]
+
+    event_date = models.DateTimeField(
+    verbose_name="Дата мероприятия",
+    help_text="Формат: YYYY-MM-DDTHH:MM"
+    )   
     
-    name = models.CharField('Название', max_length=255)
+    title = models.CharField('Название', max_length=255)
+
     budget_type = models.CharField(
         'Тип бюджета', 
         max_length=20, 
         choices=BUDGET_TYPES,
-        default='solo'
+        default='SOLO'
     )
+
+    venue_type = models.CharField(
+        'Место проведения',
+        max_length=20,
+        choices=PLACES,
+        default = 'OWN'
+    )
+
+    venue_cost = models.CharField(
+        'Стоимость Аренды',
+        null=True,  # Разрешаем NULL
+        blank=True,  # Разрешаем пустое значение
+        default=0    # Дефолтное значение
+        )
+
     owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -30,4 +58,4 @@ class Event(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f'{self.name} ({self.get_budget_type_display()})'
+        return f'{self.title} ({self.get_budget_type_display()})'
