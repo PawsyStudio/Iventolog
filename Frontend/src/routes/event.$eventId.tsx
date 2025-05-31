@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
-import { EventSettingsPage } from '../pages/EventSettigsPage';
+import { EventSettingsPage } from '../pages/EventSettingsPage';
 
 export const Route = createFileRoute('/event/$eventId')({
   component: EventSettingsPage,
