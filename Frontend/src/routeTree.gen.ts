@@ -13,6 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as EventsImport } from './routes/events'
 import { Route as IndexImport } from './routes/index'
+import { Route as EventEventIdImport } from './routes/event.$eventId'
 
 // Create/Update Routes
 
@@ -25,6 +26,12 @@ const EventsRoute = EventsImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const EventEventIdRoute = EventEventIdImport.update({
+  id: '/event/$eventId',
+  path: '/event/$eventId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -46,6 +53,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsImport
       parentRoute: typeof rootRoute
     }
+    '/event/$eventId': {
+      id: '/event/$eventId'
+      path: '/event/$eventId'
+      fullPath: '/event/$eventId'
+      preLoaderRoute: typeof EventEventIdImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -54,36 +68,41 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/events': typeof EventsRoute
+  '/event/$eventId': typeof EventEventIdRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/events': typeof EventsRoute
+  '/event/$eventId': typeof EventEventIdRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/events': typeof EventsRoute
+  '/event/$eventId': typeof EventEventIdRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/events'
+  fullPaths: '/' | '/events' | '/event/$eventId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/events'
-  id: '__root__' | '/' | '/events'
+  to: '/' | '/events' | '/event/$eventId'
+  id: '__root__' | '/' | '/events' | '/event/$eventId'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EventsRoute: typeof EventsRoute
+  EventEventIdRoute: typeof EventEventIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EventsRoute: EventsRoute,
+  EventEventIdRoute: EventEventIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -97,7 +116,8 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/events"
+        "/events",
+        "/event/$eventId"
       ]
     },
     "/": {
@@ -105,6 +125,9 @@ export const routeTree = rootRoute
     },
     "/events": {
       "filePath": "events.tsx"
+    },
+    "/event/$eventId": {
+      "filePath": "event.$eventId.tsx"
     }
   }
 }
