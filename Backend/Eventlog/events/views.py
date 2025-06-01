@@ -1,6 +1,6 @@
 from rest_framework import generics, permissions
 from .models import Event
-from .serializers import EventSerializer
+from .serializers import EventSerializer, EventUpdateSerializer
 from rest_framework.renderers import JSONRenderer
 
 class EventListCreateView(generics.ListCreateAPIView):
@@ -15,8 +15,12 @@ class EventListCreateView(generics.ListCreateAPIView):
         serializer.save(owner=self.request.user)
 
 class EventRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = EventSerializer
     permission_classes = [permissions.IsAuthenticated]
+    
+    def get_serializer_class(self):
+        if self.request.method == 'PATCH':
+            return EventUpdateSerializer  # Для обновления - ограниченный сериализатор
+        return EventSerializer  # Для остальных методов - полный
 
     def get_queryset(self):
         return Event.objects.filter(owner=self.request.user)

@@ -16,6 +16,21 @@ class Event(models.Model):
         ('RENTED','Аренда'),
     ]
 
+    guests_count = models.IntegerField(
+        'Число гостей', 
+        null=True, 
+        blank=True,
+        default=0
+        )
+
+    description = models.CharField(
+        'Описание',
+        max_length=2000,                            
+        null=True,
+        blank=True,
+        default=''
+        )
+
     event_date = models.DateTimeField(
     verbose_name="Дата мероприятия",
     help_text="Формат: YYYY-MM-DDTHH:MM"
