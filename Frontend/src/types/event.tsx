@@ -6,4 +6,5 @@ export interface Event {
   venue_cost?: number | null;
   event_date?: string;
   description?: string;
+  guests_count?: number | null;
 }
