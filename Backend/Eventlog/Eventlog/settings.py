@@ -160,3 +160,5 @@ LOGGING = {
 
 AUTH_USER_MODEL = 'log_auth.IventlogUser'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#APPEND_SLASH = False
