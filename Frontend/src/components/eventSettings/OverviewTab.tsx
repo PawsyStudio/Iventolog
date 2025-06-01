@@ -4,9 +4,39 @@ import styles from './OverviewTab.module.css';
 
 export function OverviewTab({ event }: { event: Event }) {
   const [isEditingGuests, setIsEditingGuests] = useState(false);
-  const [guestsCount, setGuestsCount] = useState(0);
+  const [guestsCount, setGuestsCount] = useState(event.guests_count || 0);
   const [isEditingDesc, setIsEditingDesc] = useState(false);
   const [description, setDescription] = useState(event.description || '');
+
+  const handleUpdateEvent = async (data: { description?: string; guests_count?: number }) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:8000/api/events/${event.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) throw new Error('Ошибка обновления');
+      // Можно добавить уведомление об успехе
+    } catch (error) {
+      console.error('Ошибка:', error);
+      // Можно добавить уведомление об ошибке
+    }
+  };
+
+  const handleSaveGuests = () => {
+    setIsEditingGuests(false);
+    handleUpdateEvent({ guests_count: guestsCount });
+  };
+
+  const handleSaveDescription = () => {
+    setIsEditingDesc(false);
+    handleUpdateEvent({ description });
+  };
 
   return (
     <div className={styles.overview}>
@@ -22,9 +52,10 @@ export function OverviewTab({ event }: { event: Event }) {
                   value={guestsCount}
                   onChange={(e) => setGuestsCount(Number(e.target.value))}
                   className={styles.input}
+                  min="0"
                 />
                 <button 
-                  onClick={() => setIsEditingGuests(false)}
+                  onClick={handleSaveGuests}
                   className={styles.button}
                 >
                   ✓
@@ -67,9 +98,10 @@ export function OverviewTab({ event }: { event: Event }) {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 className={styles.textarea}
+                maxLength={2000}
               />
               <button 
-                onClick={() => setIsEditingDesc(false)}
+                onClick={handleSaveDescription}
                 className={styles.button}
               >
                 ✓ Подтвердить
