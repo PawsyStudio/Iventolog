@@ -35,14 +35,14 @@ class EventUpdateSerializer(serializers.ModelSerializer):
             'description': {'required': False, 'allow_null': True, 'allow_blank': True},
             'guests_count': {'required': False, 'allow_null': True}
         }
-    def validate(self, data):
+    #def validate(self, data):
         # Получаем текущие значения из БД
-        instance = self.instance
-        if 'description' not in data:
-            data['description'] = instance.description
-        if 'guests_count' not in data:
-            data['guests_count'] = instance.guests_count
-        return data
+        #instance = self.instance
+        #if 'description' not in data:
+        #    data['description'] = instance.description
+        #if 'guests_count' not in data:
+        #    data['guests_count'] = instance.guests_count
+        #return data
 
     def update(self, instance, validated_data):
         # Устанавливаем дефолтные значения, если поля не переданы
