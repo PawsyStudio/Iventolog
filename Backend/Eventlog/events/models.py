@@ -87,7 +87,7 @@ class Menu(models.Model):
         'Цена товара'
         )
 
-    quntity_per_person = models.FloatField(
+    quantity_per_person = models.FloatField(
         'Кол-во на человека'
         )
 

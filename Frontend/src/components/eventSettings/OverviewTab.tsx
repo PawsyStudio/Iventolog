@@ -118,10 +118,7 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
           )}
         </div>
 
-<<<<<<< HEAD
 
-=======
->>>>>>> b6ec5d3a4f30a5b7bea3c553877694d3c3b98fc3
         <div className={styles.controls}>
           {isEditing ? (
             <>

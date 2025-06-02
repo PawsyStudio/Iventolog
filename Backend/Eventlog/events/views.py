@@ -16,7 +16,6 @@ class EventListCreateView(generics.ListCreateAPIView):
 
 class EventRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
-    lookup_field = 'event_id'  # Указываем какое поле использовать для поиска
     
     
     def get_serializer_class(self):
@@ -31,7 +30,6 @@ class EventRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 class MenuListCreateView(generics.ListCreateAPIView):
     serializer_class = MenuSerializer
     permission_classes = [permissions.IsAuthenticated]
-    lookup_field = 'event_id'  # Используем event_id вместо pk
 
     def get_queryset(self):
         return Menu.objects.filter(

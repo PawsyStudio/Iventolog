@@ -5,11 +5,11 @@ class MenuSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Menu
-        fields = ['id','name','price','quntity_per_person','event']
+        fields = ['id','name','price','quantity_per_person','event']
         extra_kwargs = {
             'name': {'required': True},
             'price':{'required': True},
-            'quntity_per_person': {'required': True},
+            'quantity_per_person': {'required': True},
             'event':{'read_only': True}
             }
 
