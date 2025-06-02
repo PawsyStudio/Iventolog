@@ -1,0 +1,95 @@
+.container {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+}
+
+.menuTable {
+  flex: 3;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.budgetSummary {
+  flex: 1;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.tableHeader, .tableRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+.tableHeader {
+  font-weight: bold;
+  border-bottom: 2px solid #3498db;
+}
+
+.tableRow {
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.tableRow:hover {
+  background-color: #f5f5f5;
+}
+
+.tableRow.selected {
+  background-color: #ffecec;
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.addButton {
+  background: #4CAF50;
+  color: white;
+}
+
+.deleteButton {
+  background: #f44336;
+  color: white;
+}
+
+.confirmButton {
+  background: #f44336;
+  color: white;
+}
+
+.cancelButton {
+  background: #757575;
+  color: white;
+}
+
+.addItemForm {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  align-items: center;
+}
+
+.addItemForm input {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.addItemForm button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
