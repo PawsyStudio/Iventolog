@@ -1,16 +1,34 @@
 from rest_framework import serializers
-from .models import Event
+from .models import Event, Menu
+
+class MenuSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Menu
+        fields = ['id','name','price','quntity_per_person','event']
+        extra_kwargs = {
+            'name': {'required': True},
+            'price':{'required': True},
+            'quntity_per_person': {'required': True},
+            'event':{'read_only': True}
+            }
+
+    def create(self, validated_data):
+        validated_data['event'] = self.context['event']
+        return super().create(validated_data)
+    
 
 class EventSerializer(serializers.ModelSerializer):
     budget_type_display = serializers.CharField(source='get_budget_type_display', read_only=True)
     venue_type_display = serializers.CharField(source='get_venue_type_display', read_only=True)
+    menu_items = MenuSerializer(many=True, read_only=True)  
 
     class Meta:
         model = Event
         fields = [
             'id', 'title', 'budget_type', 'budget_type_display', 
             'venue_type', 'venue_type_display', 'venue_cost',
-            'event_date', 'created_at', 'description', 'guests_count'
+            'event_date', 'created_at', 'description', 'guests_count', 'menu_items'
         ]
         extra_kwargs = {
             'title': {'required': True, 'allow_blank': False},
@@ -30,25 +48,14 @@ class EventSerializer(serializers.ModelSerializer):
 class EventUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
-        fields = ['description', 'guests_count']  # Только эти поля можно обновлять
+        fields = ['description', 'guests_count']  
         extra_kwargs = {
             'description': {'required': False, 'allow_null': True, 'allow_blank': True},
             'guests_count': {'required': False, 'allow_null': True}
         }
-    #def validate(self, data):
-        # Получаем текущие значения из БД
-        #instance = self.instance
-        #if 'description' not in data:
-        #    data['description'] = instance.description
-        #if 'guests_count' not in data:
-        #    data['guests_count'] = instance.guests_count
-        #return data
+    
 
-    def update(self, instance, validated_data):
-        # Устанавливаем дефолтные значения, если поля не переданы
-        if 'description' not in validated_data:
-            validated_data['description'] = None
-        if 'guests_count' not in validated_data:
-            validated_data['guests_count'] = None
-            
-        return super().update(instance, validated_data)
+
+
+
+

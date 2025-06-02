@@ -1,41 +1,66 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Event } from '@/types/event';
 import styles from './OverviewTab.module.css';
 
-export function OverviewTab({ event }: { event: Event }) {
-  const [isEditingGuests, setIsEditingGuests] = useState(false);
-  const [guestsCount, setGuestsCount] = useState(event.guests_count || 0);
-  const [isEditingDesc, setIsEditingDesc] = useState(false);
-  const [description, setDescription] = useState(event.description || '');
+export function OverviewTab({ event: initialEvent }: { event: Event }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentEvent, setCurrentEvent] = useState(initialEvent);
+  const [formData, setFormData] = useState({
+    guests_count: initialEvent.guests_count || 0,
+    description: initialEvent.description || ''
+  });
 
-  const handleUpdateEvent = async (data: { description?: string; guests_count?: number }) => {
+  // Обновляем локальное состояние при изменении initialEvent
+  useEffect(() => {
+    setCurrentEvent(initialEvent);
+    setFormData({
+      guests_count: initialEvent.guests_count || 0,
+      description: initialEvent.description || ''
+    });
+  }, [initialEvent]);
+
+  const handleUpdateEvent = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8000/api/events/${event.id}`, {
+      
+      const dataToSend: { guests_count?: number; description?: string } = {};
+      
+      if (formData.guests_count !== undefined) {
+        dataToSend.guests_count = formData.guests_count;
+      }
+      
+      if (formData.description !== undefined) {
+        dataToSend.description = formData.description;
+      }
+
+      const response = await fetch(`http://localhost:8000/api/events/${initialEvent.id}/`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(dataToSend)
       });
 
       if (!response.ok) throw new Error('Ошибка обновления');
-      // Можно добавить уведомление об успехе
+      
+      const updatedEvent = await response.json();
+      
+      // Обновляем локальное состояние
+      setCurrentEvent(updatedEvent);
+      setIsEditing(false);
+      
     } catch (error) {
       console.error('Ошибка:', error);
-      // Можно добавить уведомление об ошибке
     }
   };
 
-  const handleSaveGuests = () => {
-    setIsEditingGuests(false);
-    handleUpdateEvent({ guests_count: guestsCount });
-  };
-
-  const handleSaveDescription = () => {
-    setIsEditingDesc(false);
-    handleUpdateEvent({ description });
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'guests_count' ? Number(value) : value
+    }));
   };
 
   return (
@@ -43,37 +68,7 @@ export function OverviewTab({ event }: { event: Event }) {
       <div className={styles.summary}>
         <h2>Сводка по мероприятию:</h2>
         <ul className={styles.list}>
-          <li>
-            Количество гостей: 
-            {isEditingGuests ? (
-              <>
-                <input 
-                  type="number" 
-                  value={guestsCount}
-                  onChange={(e) => setGuestsCount(Number(e.target.value))}
-                  className={styles.input}
-                  min="0"
-                />
-                <button 
-                  onClick={handleSaveGuests}
-                  className={styles.button}
-                >
-                  ✓
-                </button>
-              </>
-            ) : (
-              <>
-                {guestsCount}
-                <button 
-                  onClick={() => setIsEditingGuests(true)}
-                  className={styles.button}
-                >
-                  Редактировать
-                </button>
-              </>
-            )}
-          </li>
-          {event.budget_type === 'GROUP' && (
+          {currentEvent.budget_type === 'GROUP' && (
             <li>Сумма с человека: 0 RUB</li>
           )}
           <li>Итоговая сумма: 0 RUB</li>
@@ -83,42 +78,61 @@ export function OverviewTab({ event }: { event: Event }) {
       <div className={styles.params}>
         <h2>Основные параметры:</h2>
         <ul className={styles.list}>
-          <li>Название мероприятия: {event.title}</li>
-          <li>Тип Бюджета: {event.budget_type === 'SOLO' ? 'Соло' : 'Группа'}</li>
-          <li>Тип места проведения: {event.venue_type === 'OWN' ? 'Своё' : 'Съёмное'}</li>
-          <li>Дата проведения: {event.event_date ? new Date(event.event_date).toLocaleString() : 'Не указана'}</li>
+          <li>Название мероприятия: {currentEvent.title}</li>
+          <li>Тип Бюджета: {currentEvent.budget_type === 'SOLO' ? 'Соло' : 'Группа'}</li>
+          <li>Тип места проведения: {currentEvent.venue_type === 'OWN' ? 'Своё' : 'Съёмное'}</li>
+          <li>Дата проведения: {currentEvent.event_date ? new Date(currentEvent.event_date).toLocaleString() : 'Не указана'}</li>
           <li>Дата окончания опроса: (заглушка)</li>
+          
+          <li>
+            Количество гостей: 
+            {isEditing ? (
+              <input 
+                type="number" 
+                name="guests_count"
+                value={formData.guests_count}
+                onChange={handleInputChange}
+                className={styles.input}
+                min="0"
+              />
+            ) : (
+              currentEvent.guests_count || 0
+            )}
+          </li>
         </ul>
 
         <div className={styles.descriptionBlock}>
           <h3>Описание мероприятия</h3>
-          {isEditingDesc ? (
+          {isEditing ? (
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              className={styles.textarea}
+              maxLength={2000}
+            />
+          ) : (
+            <div className={styles.descriptionText}>
+              {currentEvent.description || 'Описание отсутствует'}
+            </div>
+          )}
+        </div>
+
+
+        <div className={styles.controls}>
+          {isEditing ? (
             <>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className={styles.textarea}
-                maxLength={2000}
-              />
-              <button 
-                onClick={handleSaveDescription}
-                className={styles.button}
-              >
-                ✓ Подтвердить
+              <button onClick={() => setIsEditing(false)} className={styles.buttonCancel}>
+                Отмена
+              </button>
+              <button onClick={handleUpdateEvent} className={styles.buttonSave}>
+                Сохранить
               </button>
             </>
           ) : (
-            <>
-              <div className={styles.descriptionText}>
-                {description || 'Описание отсутствует'}
-              </div>
-              <button 
-                onClick={() => setIsEditingDesc(true)}
-                className={styles.button}
-              >
-                Редактировать
-              </button>
-            </>
+            <button onClick={() => setIsEditing(true)} className={styles.buttonEdit}>
+              Редактировать
+            </button>
           )}
         </div>
       </div>

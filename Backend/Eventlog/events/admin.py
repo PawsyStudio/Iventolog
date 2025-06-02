@@ -1,5 +1,5 @@
 from django.contrib import admin
-from events.models import Event
+from events.models import Event, Menu
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
@@ -21,3 +21,4 @@ class EventAdmin(admin.ModelAdmin):
 
     # Можно добавить это в list_display, если хочешь
     list_display = ('title', 'budget_type', 'venue_type', 'owner', 'formatted_event_date', 'display_venue_cost', 'created_at')
+

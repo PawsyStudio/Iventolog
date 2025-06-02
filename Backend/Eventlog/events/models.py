@@ -54,9 +54,9 @@ class Event(models.Model):
 
     venue_cost = models.CharField(
         'Стоимость Аренды',
-        null=True,  # Разрешаем NULL
-        blank=True,  # Разрешаем пустое значение
-        default=0    # Дефолтное значение
+        null=True,  
+        blank=True,  
+        default=0   
         )
 
     owner = models.ForeignKey(
@@ -74,3 +74,34 @@ class Event(models.Model):
 
     def __str__(self):
         return f'{self.title} ({self.get_budget_type_display()})'
+
+
+class Menu(models.Model):
+
+    name = models.CharField(
+        'Название товара',
+        max_length=20,
+        )
+
+    price = models.IntegerField(
+        'Цена товара'
+        )
+
+    quntity_per_person = models.FloatField(
+        'Кол-во на человека'
+        )
+
+    event = models.ForeignKey(
+        Event,
+        on_delete=models.CASCADE,
+        related_name='menu_items',
+        verbose_name='Мероприятие'
+    )
+
+    def __str__(self):
+        return f'{self.name}'
+
+    #def total_cost(self, guests_count=None):
+    #    """Рассчитывает общую стоимость для указанного количества гостей"""
+    #    guests = guests_count if guests_count is not None else self.event.guests_count
+    #    return round(float(self.price) * float(self.quantity_per_person) * guests, 2)
