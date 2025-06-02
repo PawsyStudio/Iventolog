@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import styles from './MenuAndBudgetTab.module.css';
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> b6ec5d3a4f30a5b7bea3c553877694d3c3b98fc3
 interface MenuItem {
   id: string;
   name: string;
@@ -136,7 +139,10 @@ export function MenuTab({ eventId }: { eventId: string }) {
         </div>
       )}
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> b6ec5d3a4f30a5b7bea3c553877694d3c3b98fc3
       <div className={styles.menuList}>
         {menuItems.length > 0 ? (
           <table>
