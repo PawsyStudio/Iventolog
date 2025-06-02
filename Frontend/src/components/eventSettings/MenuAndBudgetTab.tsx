@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import styles from './MenuTab.module.css';
+import styles from './MenuAndBudgetTab.module.css';
 
 interface MenuItem {
   id: string;
