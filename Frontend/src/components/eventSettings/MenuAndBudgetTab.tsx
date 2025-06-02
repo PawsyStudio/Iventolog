@@ -1,179 +1,163 @@
 import { useState, useEffect } from 'react';
-import type { MenuItem } from '@/types/menu';
-import styles from './MenuAndBudgetTab.module.css';
+import styles from './MenuTab.module.css';
 
-export function MenuAndBudgetTab({ eventId }: { eventId: string }) {
+interface MenuItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity_per_person: number;
+}
+
+export function MenuTab({ eventId }: { eventId: string }) {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [isAddingItem, setIsAddingItem] = useState(false);
-  const [isDeletingItems, setIsDeletingItems] = useState(false);
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [newItem, setNewItem] = useState({
     name: '',
     price: 0,
     quantity_per_person: 1
   });
+  const [error, setError] = useState<string | null>(null);
 
   // Загрузка меню
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/events/${eventId}/menu/`);
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:8000/api/events/${eventId}/menu/`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (response.status === 401) {
+          localStorage.removeItem('token');
+          window.location.href = '/login';
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error('Ошибка загрузки меню');
+        }
+
         const data = await response.json();
         setMenuItems(data);
-      } catch (error) {
-        console.error('Ошибка загрузки меню:', error);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Ошибка сервера');
       }
     };
 
     fetchMenu();
   }, [eventId]);
 
-  // Добавление нового товара
+  // Добавление нового пункта меню
   const handleAddItem = async () => {
     try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = '/login';
+        return;
+      }
+
       const response = await fetch(`http://localhost:8000/api/events/${eventId}/menu/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(newItem)
       });
+
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error('Ошибка добавления пункта меню');
+      }
 
       const createdItem = await response.json();
       setMenuItems([...menuItems, createdItem]);
       setIsAddingItem(false);
       setNewItem({ name: '', price: 0, quantity_per_person: 1 });
-    } catch (error) {
-      console.error('Ошибка добавления товара:', error);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Ошибка сервера');
     }
-  };
-
-  // Удаление товаров
-  const handleDeleteItems = async () => {
-    try {
-      await Promise.all(
-        selectedItems.map(id => 
-          fetch(`http://localhost:8000/api/events/${eventId}/menu/${id}/`, {
-            method: 'DELETE'
-          })
-        )
-      );
-      
-      setMenuItems(menuItems.filter(item => !selectedItems.includes(item.id)));
-      setSelectedItems([]);
-      setIsDeletingItems(false);
-    } catch (error) {
-      console.error('Ошибка удаления товаров:', error);
-    }
-  };
-
-  // Выбор товара для удаления
-  const toggleItemSelection = (id: string) => {
-    setSelectedItems(prev => 
-      prev.includes(id) 
-        ? prev.filter(itemId => itemId !== id) 
-        : [...prev, id]
-    );
   };
 
   return (
     <div className={styles.container}>
-      {/* Основная таблица с меню (3/4 ширины) */}
-      <div className={styles.menuTable}>
-        <div className={styles.tableHeader}>
-          <div className={styles.fullWidth}>Меню</div>
+      {error && (
+        <div className={styles.error}>
+          {error}
+          <button onClick={() => setError(null)}>×</button>
         </div>
-        
-        <div className={styles.tableHeader}>
-          <div>Название товара</div>
-          <div>Цена товара</div>
-          <div>Количество на человека</div>
-        </div>
+      )}
 
-        {menuItems.map(item => (
-          <div 
-            key={item.id} 
-            className={`${styles.tableRow} ${isDeletingItems && selectedItems.includes(item.id) ? styles.selected : ''}`}
-            onClick={() => isDeletingItems && toggleItemSelection(item.id)}
-          >
-            <div>{item.name}</div>
-            <div>{item.price} RUB</div>
-            <div>{item.quantity_per_person}</div>
-          </div>
-        ))}
-
-        {isAddingItem && (
-          <div className={styles.addItemForm}>
-            <input
-              type="text"
-              placeholder="Название"
-              value={newItem.name}
-              onChange={(e) => setNewItem({...newItem, name: e.target.value})}
-            />
-            <input
-              type="number"
-              placeholder="Цена"
-              value={newItem.price}
-              onChange={(e) => setNewItem({...newItem, price: Number(e.target.value)})}
-              min="0"
-              step="0.01"
-            />
-            <input
-              type="number"
-              placeholder="Количество"
-              value={newItem.quantity_per_person}
-              onChange={(e) => setNewItem({...newItem, quantity_per_person: Number(e.target.value)})}
-              min="0.1"
-              step="0.1"
-            />
-            <button onClick={handleAddItem}>Создать</button>
-            <button onClick={() => setIsAddingItem(false)}>Отмена</button>
-          </div>
-        )}
-
-        <div className={styles.actions}>
-          {!isDeletingItems ? (
-            <>
-              <button 
-                onClick={() => setIsAddingItem(true)}
-                className={styles.addButton}
-              >
-                Добавить товар
-              </button>
-              <button 
-                onClick={() => setIsDeletingItems(true)}
-                className={styles.deleteButton}
-              >
-                Удалить товары
-              </button>
-            </>
-          ) : (
-            <>
-              <button 
-                onClick={handleDeleteItems}
-                className={styles.confirmButton}
-                disabled={selectedItems.length === 0}
-              >
-                Подтвердить ({selectedItems.length})
-              </button>
-              <button 
-                onClick={() => {
-                  setIsDeletingItems(false);
-                  setSelectedItems([]);
-                }}
-                className={styles.cancelButton}
-              >
-                Отмена
-              </button>
-            </>
-          )}
-        </div>
+      <div className={styles.header}>
+        <h2>Меню мероприятия</h2>
+        <button 
+          onClick={() => setIsAddingItem(true)}
+          className={styles.addButton}
+        >
+          Добавить пункт
+        </button>
       </div>
 
-      {/* Блок справа (1/4 ширины) */}
-      <div className={styles.budgetSummary}>
-        <h3>Бюджет</h3>
-        <p>Здесь будет сводка по бюджету</p>
+      {isAddingItem && (
+        <div className={styles.addForm}>
+          <input
+            type="text"
+            placeholder="Название"
+            value={newItem.name}
+            onChange={(e) => setNewItem({...newItem, name: e.target.value})}
+          />
+          <input
+            type="number"
+            placeholder="Цена"
+            value={newItem.price}
+            onChange={(e) => setNewItem({...newItem, price: Number(e.target.value)})}
+            min="0"
+          />
+          <input
+            type="number"
+            placeholder="Количество на человека"
+            value={newItem.quantity_per_person}
+            onChange={(e) => setNewItem({...newItem, quantity_per_person: Number(e.target.value)})}
+            min="0.1"
+            step="0.1"
+          />
+          <div className={styles.formButtons}>
+            <button onClick={handleAddItem}>Сохранить</button>
+            <button onClick={() => setIsAddingItem(false)}>Отмена</button>
+          </div>
+        </div>
+      )}
+
+      <div className={styles.menuList}>
+        {menuItems.length > 0 ? (
+          <table>
+            <thead>
+              <tr>
+                <th>Название</th>
+                <th>Цена</th>
+                <th>Количество</th>
+              </tr>
+            </thead>
+            <tbody>
+              {menuItems.map(item => (
+                <tr key={item.id}>
+                  <td>{item.name}</td>
+                  <td>{item.price} ₽</td>
+                  <td>{item.quantity_per_person}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>Меню пока пустое</p>
+        )}
       </div>
     </div>
   );
