@@ -1,6 +1,7 @@
 from rest_framework import generics, permissions
+from rest_framework.response import Response
 from .models import Event, Menu
-from .serializers import EventSerializer, EventUpdateSerializer, MenuSerializer
+from .serializers import EventSerializer, EventUpdateSerializer, MenuSerializer, EventBudgetSerializer
 from rest_framework.renderers import JSONRenderer
 
 class EventListCreateView(generics.ListCreateAPIView):
@@ -55,3 +56,53 @@ class MenuRetrieveDestroyView(generics.RetrieveDestroyAPIView):
             event__owner=self.request.user,
             event_id=self.kwargs['event_id']
         )
+
+class EventBudgetView(generics.RetrieveAPIView):
+    serializer_class = EventBudgetSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'pk'  # Используем стандартное поле 'id' (pk)
+
+    def get_object(self):
+        # Получаем event_id из URL
+        event_id = self.kwargs.get('event_id')
+        # Ищем мероприятие с проверкой владельца
+        return generics.get_object_or_404(
+            Event.objects.filter(owner=self.request.user),
+            pk=event_id
+        )
+
+    def retrieve(self, request, *args, **kwargs):
+        event = self.get_object()
+        
+        # Рассчитываем стоимость покупок
+        menu_items = event.menu_items.all()
+        purchases_total = sum(
+            item.price * item.quantity_per_person * (event.guests_count or 0)
+            for item in menu_items
+        )
+        
+        # Рассчитываем стоимость аренды (если не свое помещение)
+        venue_total = float(event.venue_cost) if event.venue_type == 'RENTED' and event.venue_cost else 0
+        
+        # Общая сумма
+        overall_total = purchases_total + venue_total
+        
+        # Рассчитываем суммы на человека (если указано количество гостей)
+        guests = event.guests_count or 0
+        per_person = {
+            'purchases': purchases_total / guests if guests > 0 else 0,
+            'venue': venue_total / guests if guests > 0 else 0,
+            'total': overall_total / guests if guests > 0 else 0,
+        }
+        
+        # Обновляем поля в модели
+        event.purchases_per_person = per_person['purchases']
+        event.purchases_overall = purchases_total
+        event.venue_per_person = per_person['venue']
+        event.venue_overall = venue_total
+        event.total_per_person = per_person['total']
+        event.total_overall = overall_total
+        event.save()
+        
+        serializer = self.get_serializer(event)
+        return Response(serializer.data)
