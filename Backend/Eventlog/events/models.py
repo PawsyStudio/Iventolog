@@ -67,6 +67,42 @@ class Event(models.Model):
     )
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
 
+    total_per_person = models.FloatField(
+        'Общая за чел.',
+        null=True,  
+        blank=True,
+        )
+
+    total_overall = models.FloatField(
+        'Общая общая сумма',
+        null=True,  
+        blank=True,
+        )
+
+    purchases_per_person = models.FloatField(
+        'За покупки с чел.',
+        null=True,  
+        blank=True,
+        )
+
+    purchases_overall = models.FloatField(
+        'За покупки общая сумма',
+        null=True,  
+        blank=True,
+        )
+
+    venue_per_person = models.FloatField(
+        'За помещение с чел.',
+        null=True,  
+        blank=True,
+        )
+
+    venue_overall = models.FloatField(
+        'За помещение общая сумма',
+        null=True,  
+        blank=True,
+        )
+
     class Meta:
         verbose_name = 'Мероприятие'
         verbose_name_plural = 'Мероприятия'
