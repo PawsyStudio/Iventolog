@@ -2,11 +2,21 @@ import { useState, useEffect, useRef } from 'react';
 import type { Event } from '@/types/event';
 import styles from './OverviewTab.module.css';
 
+interface BudgetData {
+  total_per_person: number;
+  total_overall: number;
+  purchases_per_person: number;
+  purchases_overall: number;
+  venue_per_person: number;
+  venue_overall: number;
+}
+
 export function OverviewTab({ event: initialEvent }: { event: Event }) {
   const [currentEvent, setCurrentEvent] = useState(initialEvent);
   const [isEditingParams, setIsEditingParams] = useState(false);
   const [guestsCount, setGuestsCount] = useState(initialEvent.guests_count || 0);
   const [isEditingGuests, setIsEditingGuests] = useState(false);
+  const [budgetData, setBudgetData] = useState<BudgetData | null>(null);
   const guestsInputRef = useRef<HTMLInputElement>(null);
   
   // Форма для редактирования параметров
@@ -17,6 +27,25 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
     event_date: initialEvent.event_date ? 
       new Date(initialEvent.event_date).toISOString().slice(0, 16) : ''
   });
+
+  // Загрузка данных бюджета
+  const fetchBudget = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:8000/api/events/${initialEvent.id}/budget/`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error('Ошибка загрузки бюджета');
+      
+      const data = await response.json();
+      setBudgetData(data);
+    } catch (err) {
+      console.error(err instanceof Error ? err.message : 'Ошибка сервера');
+    }
+  };
 
   // Обновление состояний при изменении initialEvent
   useEffect(() => {
@@ -29,6 +58,7 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
       event_date: initialEvent.event_date ? 
         new Date(initialEvent.event_date).toISOString().slice(0, 16) : ''
     });
+    fetchBudget();
   }, [initialEvent]);
 
   // Фокус на поле ввода гостей при активации
@@ -42,8 +72,11 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
   const updateGuestsCount = async () => {
     try {
       const token = localStorage.getItem('token');
-      if (!token) throw new Error('Необходима авторизация');
-      
+      if (!token) {
+        window.location.href = '/login';
+        return;
+      }
+
       const response = await fetch(`http://localhost:8000/api/events/${initialEvent.id}/`, {
         method: 'PATCH',
         headers: {
@@ -58,6 +91,7 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
       const updatedEvent = await response.json();
       setCurrentEvent(updatedEvent);
       setIsEditingGuests(false);
+      fetchBudget();
       
     } catch (error) {
       console.error('Ошибка:', error);
@@ -115,6 +149,7 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
       const updatedEvent = await response.json();
       setCurrentEvent(updatedEvent);
       setIsEditingParams(false);
+      fetchBudget();
       
     } catch (error) {
       console.error('Ошибка:', error);
@@ -153,7 +188,6 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
       <div className={styles.summary}>
         <h2>Сводка по мероприятию:</h2>
         <ul className={styles.list}>
-          <li>Итоговая сумма: 0 RUB</li>
           <li>
             Количество гостей: 
             {isEditingGuests ? (
@@ -164,7 +198,6 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
                 value={guestsCount}
                 onChange={(e) => setGuestsCount(Number(e.target.value))}
                 onKeyDown={handleGuestsKeyDown}
-                onBlur={() => setIsEditingGuests(false)}
                 min="0"
               />
             ) : (
@@ -176,6 +209,8 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
               </span>
             )}
           </li>
+          <li>Сумма с человека: {budgetData ? `${budgetData.total_per_person.toFixed(2)} RUB` : 'Загрузка...'}</li>
+          <li>Итоговая сумма: {budgetData ? `${budgetData.total_overall.toFixed(2)} RUB` : 'Загрузка...'}</li>
         </ul>
       </div>
 
