@@ -10,7 +10,6 @@ interface CreateEventFormProps {
 export function CreateEventForm({ onSuccess, onError, onCancel }: CreateEventFormProps) {
   const [formData, setFormData] = useState({
     title: '',
-    budget_type: 'SOLO' as 'SOLO' | 'GROUP',
     venue_type: 'OWN' as 'OWN' | 'RENTED',
     venue_cost: '' as string | null,
     event_date: '',
@@ -34,7 +33,6 @@ export function CreateEventForm({ onSuccess, onError, onCancel }: CreateEventFor
 
       const payload = {
         title: formData.title,
-        budget_type: formData.budget_type,
         venue_type: formData.venue_type,
         venue_cost: formData.venue_type === 'RENTED' ? Number(formData.venue_cost) : null,
         event_date: formData.event_date,
@@ -85,19 +83,6 @@ export function CreateEventForm({ onSuccess, onError, onCancel }: CreateEventFor
           required
           maxLength={100}
         />
-      </div>
-
-      <div className={styles.formGroup}>
-        <label className={styles.label}>Тип бюджета *</label>
-        <select
-          className={styles.select}
-          value={formData.budget_type}
-          onChange={(e) => handleChange('budget_type', e.target.value as 'SOLO' | 'GROUP')}
-          required
-        >
-          <option value="SOLO">Соло</option>
-          <option value="GROUP">Групповой</option>
-        </select>
       </div>
 
       <div className={styles.formGroup}>

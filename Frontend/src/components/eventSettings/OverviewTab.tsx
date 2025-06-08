@@ -1,36 +1,80 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { Event } from '@/types/event';
 import styles from './OverviewTab.module.css';
 
+interface BudgetData {
+  total_per_person: number;
+  total_overall: number;
+  purchases_per_person: number;
+  purchases_overall: number;
+  venue_per_person: number;
+  venue_overall: number;
+}
+
 export function OverviewTab({ event: initialEvent }: { event: Event }) {
-  const [isEditing, setIsEditing] = useState(false);
   const [currentEvent, setCurrentEvent] = useState(initialEvent);
-  const [formData, setFormData] = useState({
-    guests_count: initialEvent.guests_count || 0,
-    description: initialEvent.description || ''
+  const [isEditingParams, setIsEditingParams] = useState(false);
+  const [guestsCount, setGuestsCount] = useState(initialEvent.guests_count || 0);
+  const [isEditingGuests, setIsEditingGuests] = useState(false);
+  const [budgetData, setBudgetData] = useState<BudgetData | null>(null);
+  const guestsInputRef = useRef<HTMLInputElement>(null);
+  
+  // Форма для редактирования параметров
+  const [formParams, setFormParams] = useState({
+    title: initialEvent.title,
+    venue_type: initialEvent.venue_type,
+    venue_cost: initialEvent.venue_cost || '',
+    event_date: initialEvent.event_date ? 
+      new Date(initialEvent.event_date).toISOString().slice(0, 16) : ''
   });
 
-  // Обновляем локальное состояние при изменении initialEvent
-  useEffect(() => {
-    setCurrentEvent(initialEvent);
-    setFormData({
-      guests_count: initialEvent.guests_count || 0,
-      description: initialEvent.description || ''
-    });
-  }, [initialEvent]);
-
-  const handleUpdateEvent = async () => {
+  // Загрузка данных бюджета
+  const fetchBudget = async () => {
     try {
       const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:8000/api/events/${initialEvent.id}/budget/`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error('Ошибка загрузки бюджета');
       
-      const dataToSend: { guests_count?: number; description?: string } = {};
-      
-      if (formData.guests_count !== undefined) {
-        dataToSend.guests_count = formData.guests_count;
-      }
-      
-      if (formData.description !== undefined) {
-        dataToSend.description = formData.description;
+      const data = await response.json();
+      setBudgetData(data);
+    } catch (err) {
+      console.error(err instanceof Error ? err.message : 'Ошибка сервера');
+    }
+  };
+
+  // Обновление состояний при изменении initialEvent
+  useEffect(() => {
+    setCurrentEvent(initialEvent);
+    setGuestsCount(initialEvent.guests_count || 0);
+    setFormParams({
+      title: initialEvent.title,
+      venue_type: initialEvent.venue_type,
+      venue_cost: initialEvent.venue_cost || '',
+      event_date: initialEvent.event_date ? 
+        new Date(initialEvent.event_date).toISOString().slice(0, 16) : ''
+    });
+    fetchBudget();
+  }, [initialEvent]);
+
+  // Фокус на поле ввода гостей при активации
+  useEffect(() => {
+    if (isEditingGuests && guestsInputRef.current) {
+      guestsInputRef.current.focus();
+    }
+  }, [isEditingGuests]);
+
+  // Обновление количества гостей
+  const updateGuestsCount = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = '/login';
+        return;
       }
 
       const response = await fetch(`http://localhost:8000/api/events/${initialEvent.id}/`, {
@@ -39,28 +83,104 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(dataToSend)
+        body: JSON.stringify({ guests_count: guestsCount })
       });
 
       if (!response.ok) throw new Error('Ошибка обновления');
       
       const updatedEvent = await response.json();
-      
-      // Обновляем локальное состояние
       setCurrentEvent(updatedEvent);
-      setIsEditing(false);
+      setIsEditingGuests(false);
+      fetchBudget();
       
     } catch (error) {
       console.error('Ошибка:', error);
+      setGuestsCount(currentEvent.guests_count || 0);
+      setIsEditingGuests(false);
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
+  // Обработчик нажатия клавиш для поля гостей
+  const handleGuestsKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      updateGuestsCount();
+    } else if (e.key === 'Escape') {
+      setGuestsCount(currentEvent.guests_count || 0);
+      setIsEditingGuests(false);
+    }
+  };
+
+  // Обновление основных параметров
+  const updateEventParams = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Необходима авторизация');
+
+      if (formParams.venue_type === 'RENTED' && !formParams.venue_cost) {
+        throw new Error('Укажите стоимость аренды');
+      }
+
+      const payload: any = {
+        title: formParams.title,
+        venue_type: formParams.venue_type,
+        event_date: formParams.event_date
+      };
+
+      if (formParams.venue_type === 'RENTED') {
+        payload.venue_cost = Number(formParams.venue_cost);
+      } else {
+        payload.venue_cost = null;
+      }
+
+      const response = await fetch(`http://localhost:8000/api/events/${initialEvent.id}/`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Ошибка обновления');
+      }
+      
+      const updatedEvent = await response.json();
+      setCurrentEvent(updatedEvent);
+      setIsEditingParams(false);
+      fetchBudget();
+      
+    } catch (error) {
+      console.error('Ошибка:', error);
+      setFormParams({
+        title: currentEvent.title,
+        venue_type: currentEvent.venue_type,
+        venue_cost: currentEvent.venue_cost || '',
+        event_date: currentEvent.event_date ? 
+          new Date(currentEvent.event_date).toISOString().slice(0, 16) : ''
+      });
+    }
+  };
+
+  // Обработчик изменений в форме параметров
+  const handleParamChange = (field: string, value: string | number) => {
+    setFormParams(prev => ({
       ...prev,
-      [name]: name === 'guests_count' ? Number(value) : value
+      [field]: value
     }));
+  };
+
+  // Отмена редактирования параметров
+  const cancelParamsEdit = () => {
+    setFormParams({
+      title: currentEvent.title,
+      venue_type: currentEvent.venue_type,
+      venue_cost: currentEvent.venue_cost || '',
+      event_date: currentEvent.event_date ? 
+        new Date(currentEvent.event_date).toISOString().slice(0, 16) : ''
+    });
+    setIsEditingParams(false);
   };
 
   return (
@@ -68,73 +188,122 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
       <div className={styles.summary}>
         <h2>Сводка по мероприятию:</h2>
         <ul className={styles.list}>
-          {currentEvent.budget_type === 'GROUP' && (
-            <li>Сумма с человека: 0 RUB</li>
-          )}
-          <li>Итоговая сумма: 0 RUB</li>
+          <li>
+            Количество гостей: 
+            {isEditingGuests ? (
+              <input
+                ref={guestsInputRef}
+                type="number"
+                className={styles.guestsInput}
+                value={guestsCount}
+                onChange={(e) => setGuestsCount(Number(e.target.value))}
+                onKeyDown={handleGuestsKeyDown}
+                min="0"
+              />
+            ) : (
+              <span 
+                className={styles.editableValue}
+                onClick={() => setIsEditingGuests(true)}
+              >
+                {guestsCount}
+              </span>
+            )}
+          </li>
+          <li>Сумма с человека: {budgetData ? `${budgetData.total_per_person.toFixed(2)} RUB` : 'Загрузка...'}</li>
+          <li>Итоговая сумма: {budgetData ? `${budgetData.total_overall.toFixed(2)} RUB` : 'Загрузка...'}</li>
         </ul>
       </div>
 
       <div className={styles.params}>
-        <h2>Основные параметры:</h2>
-        <ul className={styles.list}>
-          <li>Название мероприятия: {currentEvent.title}</li>
-          <li>Тип Бюджета: {currentEvent.budget_type === 'SOLO' ? 'Соло' : 'Группа'}</li>
-          <li>Тип места проведения: {currentEvent.venue_type === 'OWN' ? 'Своё' : 'Съёмное'}</li>
-          <li>Дата проведения: {currentEvent.event_date ? new Date(currentEvent.event_date).toLocaleString() : 'Не указана'}</li>
-          <li>Дата окончания опроса: (заглушка)</li>
-          
-          <li>
-            Количество гостей: 
-            {isEditing ? (
-              <input 
-                type="number" 
-                name="guests_count"
-                value={formData.guests_count}
-                onChange={handleInputChange}
-                className={styles.input}
-                min="0"
-              />
-            ) : (
-              currentEvent.guests_count || 0
-            )}
-          </li>
-        </ul>
-
-        <div className={styles.descriptionBlock}>
-          <h3>Описание мероприятия</h3>
-          {isEditing ? (
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              className={styles.textarea}
-              maxLength={2000}
-            />
-          ) : (
-            <div className={styles.descriptionText}>
-              {currentEvent.description || 'Описание отсутствует'}
-            </div>
-          )}
-        </div>
-
-
-        <div className={styles.controls}>
-          {isEditing ? (
-            <>
-              <button onClick={() => setIsEditing(false)} className={styles.buttonCancel}>
-                Отмена
-              </button>
-              <button onClick={handleUpdateEvent} className={styles.buttonSave}>
-                Сохранить
-              </button>
-            </>
-          ) : (
-            <button onClick={() => setIsEditing(true)} className={styles.buttonEdit}>
+        <div className={styles.paramsHeader}>
+          <h2>Основные параметры:</h2>
+          {!isEditingParams && (
+            <button 
+              className={styles.editButton}
+              onClick={() => setIsEditingParams(true)}
+            >
               Редактировать
             </button>
           )}
         </div>
+        
+        <ul className={styles.list}>
+          <li>
+            Название мероприятия: 
+            {isEditingParams ? (
+              <input
+                type="text"
+                className={styles.input}
+                value={formParams.title}
+                onChange={(e) => handleParamChange('title', e.target.value)}
+                maxLength={100}
+              />
+            ) : (
+              currentEvent.title
+            )}
+          </li>
+          
+          <li>
+            Тип места проведения: 
+            {isEditingParams ? (
+              <select
+                className={styles.select}
+                value={formParams.venue_type}
+                onChange={(e) => handleParamChange('venue_type', e.target.value)}
+              >
+                <option value="OWN">Своё помещение</option>
+                <option value="RENTED">Аренда</option>
+              </select>
+            ) : (
+              currentEvent.venue_type === 'OWN' ? 'Своё' : 'Съёмное'
+            )}
+          </li>
+          
+          {formParams.venue_type === 'RENTED' && isEditingParams && (
+            <li>
+              Цена за аренду: 
+              <input
+                type="number"
+                className={styles.input}
+                min="0"
+                step="100"
+                value={formParams.venue_cost}
+                onChange={(e) => handleParamChange('venue_cost', e.target.value)}
+              />
+            </li>
+          )}
+          
+          <li>
+            Дата проведения: 
+            {isEditingParams ? (
+              <input
+                type="datetime-local"
+                className={styles.input}
+                value={formParams.event_date}
+                onChange={(e) => handleParamChange('event_date', e.target.value)}
+              />
+            ) : (
+              currentEvent.event_date ? new Date(currentEvent.event_date).toLocaleString() : 'Не указана'
+            )}
+          </li>
+        </ul>
+
+        {isEditingParams && (
+          <div className={styles.paramControls}>
+            <button 
+              className={styles.cancelButton}
+              onClick={cancelParamsEdit}
+            >
+              Отмена
+            </button>
+            <button 
+              className={styles.submitButton}
+              onClick={updateEventParams}
+            >
+              Подтвердить
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
