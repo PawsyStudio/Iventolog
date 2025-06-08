@@ -17,8 +17,19 @@ interface BudgetData {
   venue_overall: number;
 }
 
+// Новый интерфейс для данных о событии
+interface EventData {
+  guests_count: number;
+}
+
+// Новый интерфейс для данных о продукте
+interface ProductItem {
+  name: string;
+  totalPrice: number;
+  totalQuantity: number;
+}
+
 export function MenuAndBudgetTab({ eventId }: { eventId: string }) {
-  // Состояния для меню
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [isAddingItem, setIsAddingItem] = useState(false);
   const [newItem, setNewItem] = useState({
@@ -27,9 +38,35 @@ export function MenuAndBudgetTab({ eventId }: { eventId: string }) {
     quantity_per_person: 1
   });
   const [error, setError] = useState<string | null>(null);
-
-  // Состояния для бюджета
   const [budgetData, setBudgetData] = useState<BudgetData | null>(null);
+  
+  // Новое состояние для данных о событии
+  const [eventData, setEventData] = useState<EventData | null>(null);
+
+  // Загрузка данных о событии (количество гостей)
+  const fetchEventData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:8000/api/events/${eventId}/`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+        return;
+      }
+
+      if (!response.ok) throw new Error('Ошибка загрузки данных о событии');
+      
+      const data = await response.json();
+      setEventData({ guests_count: data.guests_count });
+    } catch (err) {
+      console.error(err instanceof Error ? err.message : 'Ошибка сервера');
+    }
+  };
 
   // Загрузка данных меню
   const fetchMenu = async () => {
@@ -79,6 +116,7 @@ export function MenuAndBudgetTab({ eventId }: { eventId: string }) {
   useEffect(() => {
     fetchMenu();
     fetchBudget();
+    fetchEventData(); // Загружаем данные о событии
   }, [eventId]);
 
   // Добавление нового пункта меню
@@ -111,15 +149,28 @@ export function MenuAndBudgetTab({ eventId }: { eventId: string }) {
       setMenuItems([...menuItems, createdItem]);
       setIsAddingItem(false);
       setNewItem({ name: '', price: 0, quantity_per_person: 1 });
-      await fetchBudget(); // Обновляем данные бюджета после изменения меню
+      await fetchBudget(); // Обновляем данные бюджета
+      await fetchEventData(); // Обновляем данные о событии
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка сервера');
     }
   };
 
+  // Рассчитываем данные для таблицы продуктов
+  const calculateProductsData = (): ProductItem[] => {
+    if (!eventData) return [];
+    
+    return menuItems.map(item => ({
+      name: item.name,
+      totalPrice: item.price * item.quantity_per_person * eventData.guests_count,
+      totalQuantity: item.quantity_per_person * eventData.guests_count
+    }));
+  };
+
+  const productsData = calculateProductsData();
+
   return (
     <div className={styles.container}>
-      {/* Блок ошибок */}
       {error && (
         <div className={styles.error}>
           {error}
@@ -127,7 +178,6 @@ export function MenuAndBudgetTab({ eventId }: { eventId: string }) {
         </div>
       )}
 
-      {/* Блок управления меню */}
       <div className={styles.menuBlock}>
         <div className={styles.header}>
           <h2>Меню мероприятия</h2>
@@ -195,7 +245,40 @@ export function MenuAndBudgetTab({ eventId }: { eventId: string }) {
         </div>
       </div>
 
-      {/* Блок с бюджетом */}
+      {/* Новая таблица: Список продуктов для закупки */}
+      <div className={styles.productsBlock}>
+        <h2>Продукты для закупки</h2>
+        
+        {eventData ? (
+          <table className={styles.productsTable}>
+            <thead>
+              <tr>
+                <th>Название</th>
+                <th>Общая цена</th>
+                <th>Количество</th>
+              </tr>
+            </thead>
+            <tbody>
+              {productsData.length > 0 ? (
+                productsData.map((product, index) => (
+                  <tr key={index}>
+                    <td>{product.name}</td>
+                    <td>{product.totalPrice.toFixed(2)} ₽</td>
+                    <td>{product.totalQuantity.toFixed(2)}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={3}>Добавьте пункты в меню</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        ) : (
+          <p>Загрузка данных о гостях...</p>
+        )}
+      </div>
+
       <div className={styles.budgetBlock}>
         <h2>Бюджет мероприятия</h2>
         
