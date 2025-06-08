@@ -19,24 +19,21 @@ class MenuSerializer(serializers.ModelSerializer):
     
 
 class EventSerializer(serializers.ModelSerializer):
-    budget_type_display = serializers.CharField(source='get_budget_type_display', read_only=True)
     venue_type_display = serializers.CharField(source='get_venue_type_display', read_only=True)
     menu_items = MenuSerializer(many=True, read_only=True)  
 
     class Meta:
         model = Event
         fields = [
-            'id', 'title', 'budget_type', 'budget_type_display', 
+            'id', 'title', 
             'venue_type', 'venue_type_display', 'venue_cost',
-            'event_date', 'created_at', 'description', 'guests_count', 'menu_items'
+            'event_date', 'created_at', 'guests_count', 'menu_items'
         ]
         extra_kwargs = {
             'title': {'required': True, 'allow_blank': False},
-            'budget_type': {'required': True},
             'event_date': {'required': True},
             'venue_cost': {'required': False, 'allow_null': True},
             'guests_count': {'required': False, 'allow_null': True},
-            'description': {'required': False, 'allow_null': True}
         }
 
     def to_representation(self, instance):
@@ -48,14 +45,16 @@ class EventSerializer(serializers.ModelSerializer):
 class EventUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
-        fields = ['description', 'guests_count']  
+        fields = ['title', 'guests_count','venue_type','venue_cost','event_date',]  
         extra_kwargs = {
-            'description': {'required': False, 'allow_null': True, 'allow_blank': True},
-            'guests_count': {'required': False, 'allow_null': True}
+            'guests_count': {'required': False, 'allow_null': True},
+            'title': {'required': False, 'allow_null': True},
+            'venue_type': {'required': False, 'allow_null': True},
+            "venue_cost": {'required': False, 'allow_null': True},
+            'event_date': {'required': False, 'allow_null': True}
         }
     
 class EventBudgetSerializer(serializers.ModelSerializer):
-    budget_type_display = serializers.CharField(source='get_budget_type_display', read_only=True)
     venue_type_display = serializers.CharField(source='get_venue_type_display', read_only=True)
     
     class Meta:
@@ -64,7 +63,6 @@ class EventBudgetSerializer(serializers.ModelSerializer):
             'total_per_person', 'total_overall',
             'purchases_per_person', 'purchases_overall',
             'venue_per_person', 'venue_overall',
-            'budget_type', 'budget_type_display',
             'venue_type', 'venue_type_display',
             'guests_count'
         ]

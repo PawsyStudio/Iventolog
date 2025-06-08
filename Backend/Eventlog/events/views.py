@@ -5,12 +5,12 @@ from .serializers import EventSerializer, EventUpdateSerializer, MenuSerializer,
 from rest_framework.renderers import JSONRenderer
 
 class EventListCreateView(generics.ListCreateAPIView):
-    renderer_classes = [JSONRenderer]  # Явно указываем JSON-рендерер
+    renderer_classes = [JSONRenderer]  
     serializer_class = EventSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Event.objects.filter(owner=self.request.user).order_by('-created_at')  # Сортировка по дате
+        return Event.objects.filter(owner=self.request.user).order_by('-created_at')  
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -21,8 +21,8 @@ class EventRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     
     def get_serializer_class(self):
         if self.request.method == 'PATCH':
-            return EventUpdateSerializer  # Для обновления - ограниченный сериализатор
-        return EventSerializer  # Для остальных методов - полный
+            return EventUpdateSerializer 
+        return EventSerializer 
 
     def get_queryset(self):
         return Event.objects.filter(owner=self.request.user)
@@ -49,7 +49,7 @@ class MenuListCreateView(generics.ListCreateAPIView):
 class MenuRetrieveDestroyView(generics.RetrieveDestroyAPIView):
     serializer_class = MenuSerializer
     permission_classes = [permissions.IsAuthenticated]
-    lookup_field = 'item_id'  # Используем item_id вместо pk
+    lookup_field = 'item_id'  
 
     def get_queryset(self):
         return Menu.objects.filter(
@@ -60,12 +60,10 @@ class MenuRetrieveDestroyView(generics.RetrieveDestroyAPIView):
 class EventBudgetView(generics.RetrieveAPIView):
     serializer_class = EventBudgetSerializer
     permission_classes = [permissions.IsAuthenticated]
-    lookup_field = 'pk'  # Используем стандартное поле 'id' (pk)
+    lookup_field = 'pk'  
 
     def get_object(self):
-        # Получаем event_id из URL
         event_id = self.kwargs.get('event_id')
-        # Ищем мероприятие с проверкой владельца
         return generics.get_object_or_404(
             Event.objects.filter(owner=self.request.user),
             pk=event_id
@@ -74,20 +72,16 @@ class EventBudgetView(generics.RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         event = self.get_object()
         
-        # Рассчитываем стоимость покупок
         menu_items = event.menu_items.all()
         purchases_total = sum(
             item.price * item.quantity_per_person * (event.guests_count or 0)
             for item in menu_items
         )
         
-        # Рассчитываем стоимость аренды (если не свое помещение)
         venue_total = float(event.venue_cost) if event.venue_type == 'RENTED' and event.venue_cost else 0
         
-        # Общая сумма
         overall_total = purchases_total + venue_total
         
-        # Рассчитываем суммы на человека (если указано количество гостей)
         guests = event.guests_count or 0
         per_person = {
             'purchases': purchases_total / guests if guests > 0 else 0,
@@ -95,7 +89,6 @@ class EventBudgetView(generics.RetrieveAPIView):
             'total': overall_total / guests if guests > 0 else 0,
         }
         
-        # Обновляем поля в модели
         event.purchases_per_person = per_person['purchases']
         event.purchases_overall = purchases_total
         event.venue_per_person = per_person['venue']

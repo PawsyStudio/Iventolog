@@ -6,11 +6,7 @@ from django.core.validators import RegexValidator
 User = get_user_model()
 
 class Event(models.Model):
-    BUDGET_TYPES = [
-        ('SOLO', 'Соло'),
-        ('GROUP', 'Групповой'), 
-    ]
-
+    
     PLACES = [
         ('OWN','Своё'),
         ('RENTED','Аренда'),
@@ -23,27 +19,12 @@ class Event(models.Model):
         default=0
         )
 
-    description = models.CharField(
-        'Описание',
-        max_length=2000,                            
-        null=True,
-        blank=True,
-        default=''
-        )
-
     event_date = models.DateTimeField(
     verbose_name="Дата мероприятия",
     help_text="Формат: YYYY-MM-DDTHH:MM"
     )   
     
     title = models.CharField('Название', max_length=255)
-
-    budget_type = models.CharField(
-        'Тип бюджета', 
-        max_length=20, 
-        choices=BUDGET_TYPES,
-        default='SOLO'
-    )
 
     venue_type = models.CharField(
         'Место проведения',
@@ -109,7 +90,7 @@ class Event(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f'{self.title} ({self.get_budget_type_display()})'
+        return f'{self.title}'
 
 
 class Menu(models.Model):

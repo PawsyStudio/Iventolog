@@ -9,8 +9,8 @@ class MenuInline(admin.TabularInline):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    list_display = ('title', 'budget_type', 'venue_type', 'owner', 'formatted_event_date', 'display_venue_cost', 'created_at')  
-    list_filter = ('budget_type', 'venue_type', 'created_at')  
+    list_display = ('title', 'venue_type', 'owner', 'formatted_event_date', 'display_venue_cost', 'created_at')  
+    list_filter = ('venue_type', 'created_at')  
     search_fields = ('title', 'owner__username')
     readonly_fields = ('created_at',)
     list_select_related = ('owner',)
