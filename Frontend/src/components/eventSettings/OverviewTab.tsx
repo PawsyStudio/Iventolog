@@ -10,7 +10,6 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
     description: initialEvent.description || ''
   });
 
-  // Обновляем локальное состояние при изменении initialEvent
   useEffect(() => {
     setCurrentEvent(initialEvent);
     setFormData({
@@ -46,7 +45,6 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
       
       const updatedEvent = await response.json();
       
-      // Обновляем локальное состояние
       setCurrentEvent(updatedEvent);
       setIsEditing(false);
       
@@ -68,9 +66,6 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
       <div className={styles.summary}>
         <h2>Сводка по мероприятию:</h2>
         <ul className={styles.list}>
-          {currentEvent.budget_type === 'GROUP' && (
-            <li>Сумма с человека: 0 RUB</li>
-          )}
           <li>Итоговая сумма: 0 RUB</li>
         </ul>
       </div>
@@ -79,7 +74,6 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
         <h2>Основные параметры:</h2>
         <ul className={styles.list}>
           <li>Название мероприятия: {currentEvent.title}</li>
-          <li>Тип Бюджета: {currentEvent.budget_type === 'SOLO' ? 'Соло' : 'Группа'}</li>
           <li>Тип места проведения: {currentEvent.venue_type === 'OWN' ? 'Своё' : 'Съёмное'}</li>
           <li>Дата проведения: {currentEvent.event_date ? new Date(currentEvent.event_date).toLocaleString() : 'Не указана'}</li>
           <li>Дата окончания опроса: (заглушка)</li>
