@@ -6,6 +6,7 @@ import Footer from '@/components/footer/Footer';
 import LogoutButton from '@/components/logoutButton/LogoutButton';
 import { OverviewTab } from '@/components/eventSettings/OverviewTab';
 import { MenuAndBudgetTab } from '@/components/eventSettings/MenuAndBudgetTab';
+import { PollAndGuestsTab } from '@/components/eventSettings/PollAndGuestsTab';
 
 export function EventSettingsPage() {
   const { eventId } = useParams({ from: '/event/$eventId' });
@@ -80,7 +81,7 @@ export function EventSettingsPage() {
       }}>
         {activeTab === 'overview' && <OverviewTab event={event} />}
         {activeTab === 'menu' && <MenuAndBudgetTab eventId={event.id} />}
-        {activeTab === 'poll' && <div>Опрос и Гости (в разработке)</div>}
+        {activeTab === 'poll' && <PollAndGuestsTab eventId={event.id} />}
       </div>
       <Footer />
     </>
