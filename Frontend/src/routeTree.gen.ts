@@ -14,7 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as EventsImport } from './routes/events'
 import { Route as IndexImport } from './routes/index'
 import { Route as EventEventIdImport } from './routes/event.$eventId'
-import { Route as EventEventIdGuestRegisterImport } from './routes/event.$eventId.guest-register'
+import { Route as PublicEventEventIdGuestRegisterImport } from './routes/public.event.$eventId.guest-register'
 
 // Create/Update Routes
 
@@ -36,11 +36,12 @@ const EventEventIdRoute = EventEventIdImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const EventEventIdGuestRegisterRoute = EventEventIdGuestRegisterImport.update({
-  id: '/guest-register',
-  path: '/guest-register',
-  getParentRoute: () => EventEventIdRoute,
-} as any)
+const PublicEventEventIdGuestRegisterRoute =
+  PublicEventEventIdGuestRegisterImport.update({
+    id: '/public/event/$eventId/guest-register',
+    path: '/public/event/$eventId/guest-register',
+    getParentRoute: () => rootRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -67,50 +68,38 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventEventIdImport
       parentRoute: typeof rootRoute
     }
-    '/event/$eventId/guest-register': {
-      id: '/event/$eventId/guest-register'
-      path: '/guest-register'
-      fullPath: '/event/$eventId/guest-register'
-      preLoaderRoute: typeof EventEventIdGuestRegisterImport
-      parentRoute: typeof EventEventIdImport
+    '/public/event/$eventId/guest-register': {
+      id: '/public/event/$eventId/guest-register'
+      path: '/public/event/$eventId/guest-register'
+      fullPath: '/public/event/$eventId/guest-register'
+      preLoaderRoute: typeof PublicEventEventIdGuestRegisterImport
+      parentRoute: typeof rootRoute
     }
   }
 }
 
 // Create and export the route tree
 
-interface EventEventIdRouteChildren {
-  EventEventIdGuestRegisterRoute: typeof EventEventIdGuestRegisterRoute
-}
-
-const EventEventIdRouteChildren: EventEventIdRouteChildren = {
-  EventEventIdGuestRegisterRoute: EventEventIdGuestRegisterRoute,
-}
-
-const EventEventIdRouteWithChildren = EventEventIdRoute._addFileChildren(
-  EventEventIdRouteChildren,
-)
-
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/events': typeof EventsRoute
-  '/event/$eventId': typeof EventEventIdRouteWithChildren
-  '/event/$eventId/guest-register': typeof EventEventIdGuestRegisterRoute
+  '/event/$eventId': typeof EventEventIdRoute
+  '/public/event/$eventId/guest-register': typeof PublicEventEventIdGuestRegisterRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/events': typeof EventsRoute
-  '/event/$eventId': typeof EventEventIdRouteWithChildren
-  '/event/$eventId/guest-register': typeof EventEventIdGuestRegisterRoute
+  '/event/$eventId': typeof EventEventIdRoute
+  '/public/event/$eventId/guest-register': typeof PublicEventEventIdGuestRegisterRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/events': typeof EventsRoute
-  '/event/$eventId': typeof EventEventIdRouteWithChildren
-  '/event/$eventId/guest-register': typeof EventEventIdGuestRegisterRoute
+  '/event/$eventId': typeof EventEventIdRoute
+  '/public/event/$eventId/guest-register': typeof PublicEventEventIdGuestRegisterRoute
 }
 
 export interface FileRouteTypes {
@@ -119,28 +108,34 @@ export interface FileRouteTypes {
     | '/'
     | '/events'
     | '/event/$eventId'
-    | '/event/$eventId/guest-register'
+    | '/public/event/$eventId/guest-register'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/events' | '/event/$eventId' | '/event/$eventId/guest-register'
+  to:
+    | '/'
+    | '/events'
+    | '/event/$eventId'
+    | '/public/event/$eventId/guest-register'
   id:
     | '__root__'
     | '/'
     | '/events'
     | '/event/$eventId'
-    | '/event/$eventId/guest-register'
+    | '/public/event/$eventId/guest-register'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EventsRoute: typeof EventsRoute
-  EventEventIdRoute: typeof EventEventIdRouteWithChildren
+  EventEventIdRoute: typeof EventEventIdRoute
+  PublicEventEventIdGuestRegisterRoute: typeof PublicEventEventIdGuestRegisterRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EventsRoute: EventsRoute,
-  EventEventIdRoute: EventEventIdRouteWithChildren,
+  EventEventIdRoute: EventEventIdRoute,
+  PublicEventEventIdGuestRegisterRoute: PublicEventEventIdGuestRegisterRoute,
 }
 
 export const routeTree = rootRoute
@@ -155,7 +150,8 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/events",
-        "/event/$eventId"
+        "/event/$eventId",
+        "/public/event/$eventId/guest-register"
       ]
     },
     "/": {
@@ -165,14 +161,10 @@ export const routeTree = rootRoute
       "filePath": "events.tsx"
     },
     "/event/$eventId": {
-      "filePath": "event.$eventId.tsx",
-      "children": [
-        "/event/$eventId/guest-register"
-      ]
+      "filePath": "event.$eventId.tsx"
     },
-    "/event/$eventId/guest-register": {
-      "filePath": "event.$eventId.guest-register.tsx",
-      "parent": "/event/$eventId"
+    "/public/event/$eventId/guest-register": {
+      "filePath": "public.event.$eventId.guest-register.tsx"
     }
   }
 }

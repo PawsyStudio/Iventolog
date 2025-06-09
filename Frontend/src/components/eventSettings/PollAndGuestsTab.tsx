@@ -144,7 +144,7 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
   };
 
   // Ссылка для регистрации гостей
-  const registrationLink = `${window.location.origin}/event/${eventId}/guest-register`;
+  const registrationLink = `${window.location.origin}/public/event/${eventId}/guest-register`;
 
   return (
     <div className={styles.container}>
