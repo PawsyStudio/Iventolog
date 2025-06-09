@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Event, Menu
+from .models import Event, Menu, Guest
 
 class MenuSerializer(serializers.ModelSerializer):
     
@@ -17,7 +17,6 @@ class MenuSerializer(serializers.ModelSerializer):
         validated_data['event'] = self.context['event']
         return super().create(validated_data)
     
-
 class EventSerializer(serializers.ModelSerializer):
     venue_type_display = serializers.CharField(source='get_venue_type_display', read_only=True)
     menu_items = MenuSerializer(many=True, read_only=True)  
@@ -45,13 +44,13 @@ class EventSerializer(serializers.ModelSerializer):
 class EventUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
-        fields = ['title', 'guests_count','venue_type','venue_cost','event_date',]  
+        fields = ['title', 'guests_count','venue_type','venue_cost','event_date']  
         extra_kwargs = {
             'guests_count': {'required': False, 'allow_null': True},
             'title': {'required': False, 'allow_null': True},
             'venue_type': {'required': False, 'allow_null': True},
             "venue_cost": {'required': False, 'allow_null': True},
-            'event_date': {'required': False, 'allow_null': True}
+            'event_date': {'required': False, 'allow_null': True},
         }
     
 class EventBudgetSerializer(serializers.ModelSerializer):
@@ -67,6 +66,24 @@ class EventBudgetSerializer(serializers.ModelSerializer):
             'guests_count'
         ]
 
+# serializers.py
+class GuestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Guest
+        fields = ['full_name', 'telegram_id']
+        extra_kwargs = {
+            'full_name': {'required': True},
+            'telegram_id': {'required': True}
+        }
+
+class PollSettingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = ['allow_menu_selection', 'poll_deadline']
+        extra_kwargs = {
+            'allow_menu_selection': {'required': False},
+            'poll_deadline': {'required': False}
+        }
 
 
 

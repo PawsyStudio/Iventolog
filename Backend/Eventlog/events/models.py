@@ -83,11 +83,16 @@ class Event(models.Model):
         null=True,  
         blank=True,
         )
+    allow_menu_selection = models.BooleanField('Разрешить выбор меню', default=False)
+
+    poll_deadline = models.DateTimeField('Дата окончания опроса', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Мероприятие'
         verbose_name_plural = 'Мероприятия'
         ordering = ['-created_at']
+
+    
 
     def __str__(self):
         return f'{self.title}'
@@ -118,7 +123,22 @@ class Menu(models.Model):
     def __str__(self):
         return f'{self.name}'
 
-    #def total_cost(self, guests_count=None):
-    #    """Рассчитывает общую стоимость для указанного количества гостей"""
-    #    guests = guests_count if guests_count is not None else self.event.guests_count
-    #    return round(float(self.price) * float(self.quantity_per_person) * guests, 2)
+class Guest(models.Model):
+
+    event = models.ForeignKey(
+        Event,
+        on_delete=models.CASCADE,
+        related_name='guests',
+        verbose_name='Мероприятие'
+    )
+    full_name = models.CharField('Полное имя', max_length=255)
+
+    telegram_id = models.CharField('Telegram ID', max_length=100)
+
+    class Meta:
+        verbose_name = 'Гость'
+        verbose_name_plural = 'Гости'
+        unique_together = ('event', 'telegram_id')
+
+    def __str__(self):
+        return f'{self.full_name} ({self.telegram_id})'

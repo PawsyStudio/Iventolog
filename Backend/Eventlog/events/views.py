@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions
 from rest_framework.response import Response
-from .models import Event, Menu
-from .serializers import EventSerializer, EventUpdateSerializer, MenuSerializer, EventBudgetSerializer
+from .models import Event, Menu, Guest
+from .serializers import EventSerializer, EventUpdateSerializer, MenuSerializer, EventBudgetSerializer, GuestSerializer, PollSettingsSerializer
 from rest_framework.renderers import JSONRenderer
 
 class EventListCreateView(generics.ListCreateAPIView):
@@ -99,3 +99,33 @@ class EventBudgetView(generics.RetrieveAPIView):
         
         serializer = self.get_serializer(event)
         return Response(serializer.data)
+
+# views.py
+class GuestListView(generics.ListCreateAPIView):
+    serializer_class = GuestSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Guest.objects.filter(
+            event_id=self.kwargs['event_id'],
+            event__owner=self.request.user
+        )
+
+    def perform_create(self, serializer):
+        event = generics.get_object_or_404(
+            Event.objects.filter(owner=self.request.user),
+            pk=self.kwargs['event_id']
+        )
+        serializer.save(event=event)
+        event.guests_count = Guest.objects.filter(event=event).count()
+        event.save()
+
+class PollSettingsView(generics.RetrieveUpdateAPIView):
+    serializer_class = PollSettingsSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return generics.get_object_or_404(
+            Event.objects.filter(owner=self.request.user),
+            pk=self.kwargs['event_id']
+        )
