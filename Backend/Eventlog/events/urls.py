@@ -7,6 +7,6 @@ urlpatterns = [
     path('events/<int:event_id>/menu/', MenuListCreateView.as_view(), name='event-menu-list'),
     path('events/<int:event_id>/menu/<int:item_id>/', MenuRetrieveDestroyView.as_view(), name='event-menu-detail'),
     path('events/<int:event_id>/budget/', EventBudgetView.as_view(), name='event-budget'),
-    path('events/<int:event_id>/poll/', PollSettingsView.as_view(), name='event-poll-settings'),
+    path('events/<int:event_id>/guests/', PollSettingsView.as_view(), name='event-poll-settings'),
     path('events/<int:event_id>/guests/', GuestListView.as_view(), name='event-guests-list'),
 ]
