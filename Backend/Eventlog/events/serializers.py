@@ -21,6 +21,7 @@ class EventSerializer(serializers.ModelSerializer):
     venue_type_display = serializers.CharField(source='get_venue_type_display', read_only=True)
     menu_items = MenuSerializer(many=True, read_only=True)  
 
+
     class Meta:
         model = Event
         fields = [
