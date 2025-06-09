@@ -16,7 +16,7 @@ export function PublicGuestRegistrationPage() {
   useEffect(() => {
     const fetchEventTitle = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/public/events/${eventId}/title`);
+        const response = await fetch(`http://localhost:8000/api/events/${eventId}/title/`);
         
         if (!response.ok) {
           if (response.status === 404) {
