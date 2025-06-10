@@ -10,14 +10,12 @@ interface Guest {
 interface PollSettings {
   allow_menu_selection: boolean;
   poll_deadline: string;
-  guests_count: number;
 }
 
 export function PollAndGuestsTab({ eventId }: { eventId: string }) {
   const [pollSettings, setPollSettings] = useState<PollSettings>({
     allow_menu_selection: false,
     poll_deadline: '',
-    guests_count: 0
   });
   
   const [guests, setGuests] = useState<Guest[]>([]);
@@ -53,8 +51,11 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
       }
       
       const data = await response.json();
-      setPollSettings(data);
-      setTempSettings(data);
+      
+      // Убираем поле guests_count при сохранении в состояние
+      const { guests_count, ...settings } = data;
+      setPollSettings(settings);
+      setTempSettings(settings);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка сервера');
     }
@@ -94,7 +95,7 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
   }, [eventId]);
 
   // Обработчик изменений настроек
-  const handleSettingChange = (field: string, value: string | boolean) => {
+  const handleSettingChange = (field: keyof PollSettings, value: string | boolean) => {
     setTempSettings(prev => ({
       ...prev,
       [field]: value
@@ -129,7 +130,9 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
       }
 
       const updatedSettings = await response.json();
-      setPollSettings(updatedSettings);
+      // Убираем guests_count из полученных данных
+      const { guests_count, ...settings } = updatedSettings;
+      setPollSettings(settings);
       setIsEditing(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка сервера');
@@ -163,7 +166,6 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
       
       // Обновляем данные
       fetchGuests();
-      fetchPollSettings();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка сервера');
     }
@@ -207,7 +209,8 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
         
         <div className={styles.settingRow}>
           <label>Зарегистрировано гостей:</label>
-          <span>{pollSettings.guests_count}</span>
+          {/* Используем длину массива гостей вместо guests_count */}
+          <span>{guests.length}</span>
         </div>
         
         <div className={styles.settingRow}>
@@ -276,6 +279,7 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
       </div>
 
       <div className={styles.guestsBlock}>
+        {/* Используем длину массива гостей вместо guests_count */}
         <h2>Список гостей ({guests.length})</h2>
         
         {guests.length > 0 ? (

@@ -14,7 +14,6 @@ interface BudgetData {
 export function OverviewTab({ event: initialEvent }: { event: Event }) {
   const [currentEvent, setCurrentEvent] = useState(initialEvent);
   const [isEditingParams, setIsEditingParams] = useState(false);
-  const [guestsCount] = useState(initialEvent.guests_count || 0);
   const [budgetData, setBudgetData] = useState<BudgetData | null>(null);
   
   // Форма для редактирования параметров
@@ -25,6 +24,9 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
     event_date: initialEvent.event_date ? 
       new Date(initialEvent.event_date).toISOString().slice(0, 16) : ''
   });
+
+  // Динамическое количество гостей
+  const guestsCount = currentEvent.guests_count || 0;
 
   // Загрузка данных бюджета
   const fetchBudget = async () => {
