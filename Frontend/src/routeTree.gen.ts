@@ -14,7 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as EventsImport } from './routes/events'
 import { Route as IndexImport } from './routes/index'
 import { Route as EventEventIdImport } from './routes/event.$eventId'
-import { Route as PublicEventEventIdGuestRegisterImport } from './routes/public.event.$eventId.guest-register'
+import { Route as PublicEventEventIdGuestRegisterImport } from './routes/public/event.$eventId.guest-register'
 
 // Create/Update Routes
 
@@ -164,7 +164,7 @@ export const routeTree = rootRoute
       "filePath": "event.$eventId.tsx"
     },
     "/public/event/$eventId/guest-register": {
-      "filePath": "public.event.$eventId.guest-register.tsx"
+      "filePath": "public/event.$eventId.guest-register.tsx"
     }
   }
 }
