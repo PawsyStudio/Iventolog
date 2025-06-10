@@ -24,6 +24,7 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
   const [isEditing, setIsEditing] = useState(false);
   const [tempSettings, setTempSettings] = useState<PollSettings>({...pollSettings});
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Загрузка настроек опроса
   const fetchPollSettings = async () => {
@@ -41,7 +42,15 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
         return;
       }
 
-      if (!response.ok) throw new Error('Ошибка загрузки настроек опроса');
+      if (response.status === 404) {
+        setError('Мероприятие не найдено');
+        setIsLoading(false);
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error('Ошибка загрузки настроек опроса');
+      }
       
       const data = await response.json();
       setPollSettings(data);
@@ -61,12 +70,20 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
         },
       });
 
-      if (!response.ok) throw new Error('Ошибка загрузки списка гостей');
+      if (!response.ok) {
+        if (response.status === 404) {
+          setError('Мероприятие не найдено');
+        } else {
+          throw new Error('Ошибка загрузки списка гостей');
+        }
+      }
       
       const data = await response.json();
       setGuests(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка сервера');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -93,6 +110,7 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
         return;
       }
 
+      setIsLoading(true);
       const response = await fetch(`http://localhost:8000/api/events/${eventId}/poll/`, {
         method: 'PATCH',
         headers: {
@@ -105,13 +123,18 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
         })
       });
 
-      if (!response.ok) throw new Error('Ошибка сохранения настроек');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Ошибка сохранения настроек');
+      }
 
       const updatedSettings = await response.json();
       setPollSettings(updatedSettings);
       setIsEditing(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка сервера');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -123,6 +146,8 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
 
   // Удаление гостя
   const handleDeleteGuest = async (guestId: string) => {
+    if (!confirm('Вы уверены, что хотите удалить гостя?')) return;
+    
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:8000/api/guests/${guestId}`, {
@@ -132,11 +157,12 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
         },
       });
 
-      if (!response.ok) throw new Error('Ошибка удаления гостя');
+      if (!response.ok) {
+        throw new Error('Ошибка удаления гостя');
+      }
       
-      // Обновляем список гостей
+      // Обновляем данные
       fetchGuests();
-      // Обновляем счетчик гостей
       fetchPollSettings();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка сервера');
@@ -145,6 +171,14 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
 
   // Ссылка для регистрации гостей
   const registrationLink = `${window.location.origin}/public/event/${eventId}/guest-register`;
+
+  if (isLoading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loadingMessage}>Загрузка данных...</div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
@@ -172,7 +206,7 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
         </div>
         
         <div className={styles.settingRow}>
-          <label>Количество людей, прошедших опрос:</label>
+          <label>Зарегистрировано гостей:</label>
           <span>{pollSettings.guests_count}</span>
         </div>
         
@@ -185,7 +219,7 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
               onChange={(e) => handleSettingChange('poll_deadline', e.target.value)}
             />
           ) : (
-            <span>{new Date(pollSettings.poll_deadline).toLocaleString()}</span>
+            <span>{pollSettings.poll_deadline ? new Date(pollSettings.poll_deadline).toLocaleString() : 'Не установлена'}</span>
           )}
         </div>
         
@@ -197,10 +231,14 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
               value={registrationLink}
               readOnly
               className={styles.linkInput}
+              onClick={(e) => (e.target as HTMLInputElement).select()}
             />
             <button 
               className={styles.copyButton}
-              onClick={() => navigator.clipboard.writeText(registrationLink)}
+              onClick={() => {
+                navigator.clipboard.writeText(registrationLink);
+                alert('Ссылка скопирована в буфер обмена');
+              }}
             >
               Копировать
             </button>
@@ -212,6 +250,7 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
             <button 
               className={styles.editButton}
               onClick={() => setIsEditing(true)}
+              disabled={isLoading}
             >
               Редактировать
             </button>
@@ -220,12 +259,14 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
               <button 
                 className={styles.saveButton}
                 onClick={handleSave}
+                disabled={isLoading}
               >
-                Сохранить
+                {isLoading ? 'Сохранение...' : 'Сохранить'}
               </button>
               <button 
                 className={styles.cancelButton}
                 onClick={handleCancel}
+                disabled={isLoading}
               >
                 Отменить
               </button>
@@ -235,34 +276,37 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
       </div>
 
       <div className={styles.guestsBlock}>
-        <h2>Список гостей</h2>
+        <h2>Список гостей ({guests.length})</h2>
         
         {guests.length > 0 ? (
-          <table className={styles.guestsTable}>
-            <thead>
-              <tr>
-                <th>Telegram ID</th>
-                <th>ФИО</th>
-                <th>Действия</th>
-              </tr>
-            </thead>
-            <tbody>
-              {guests.map(guest => (
-                <tr key={guest.id}>
-                  <td>{guest.telegram_id || '-'}</td>
-                  <td>{guest.full_name}</td>
-                  <td>
-                    <button 
-                      className={styles.deleteButton}
-                      onClick={() => handleDeleteGuest(guest.id)}
-                    >
-                      Удалить
-                    </button>
-                  </td>
+          <div className={styles.tableContainer}>
+            <table className={styles.guestsTable}>
+              <thead>
+                <tr>
+                  <th>Telegram ID</th>
+                  <th>ФИО</th>
+                  <th>Действия</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {guests.map(guest => (
+                  <tr key={guest.id}>
+                    <td>{guest.telegram_id ? `@${guest.telegram_id}` : '-'}</td>
+                    <td>{guest.full_name}</td>
+                    <td>
+                      <button 
+                        className={styles.deleteButton}
+                        onClick={() => handleDeleteGuest(guest.id)}
+                        disabled={isLoading}
+                      >
+                        Удалить
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <p>Пока никто не зарегистрировался</p>
         )}

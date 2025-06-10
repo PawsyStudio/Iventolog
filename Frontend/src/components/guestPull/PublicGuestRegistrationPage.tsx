@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from '@tanstack/react-router';
 import styles from './GuestRegistrationPage.module.css';
 
-export function PublicGuestRegistrationPage() {
+export default function PublicGuestRegistrationPage() {
   const { eventId } = useParams({ from: '/public/event/$eventId/guest-register' });
   const [telegramId, setTelegramId] = useState('');
   const [fullName, setFullName] = useState('');
@@ -16,7 +16,7 @@ export function PublicGuestRegistrationPage() {
   useEffect(() => {
     const fetchEventTitle = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/public/events/${eventId}/title`);
+        const response = await fetch(`http://localhost:8000/api/events/${eventId}/title/`);
         
         if (!response.ok) {
           if (response.status === 404) {
@@ -24,6 +24,7 @@ export function PublicGuestRegistrationPage() {
           } else {
             setError('Ошибка загрузки мероприятия');
           }
+          setIsEventLoading(false);
           return;
         }
         
@@ -39,43 +40,94 @@ export function PublicGuestRegistrationPage() {
     fetchEventTitle();
   }, [eventId]);
 
+  // Проверка существующей регистрации
+  const checkExistingRegistration = async (tgId: string) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/api/events/${eventId}/guests/exists?telegram_id=${encodeURIComponent(tgId)}`
+      );
+      
+      if (response.status === 200) {
+        const data = await response.json();
+        return data.exists;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Базовая валидация
-    if (!telegramId.trim() || !fullName.trim()) {
+    if (isLoading) return;
+    
+    // Очистка и нормализация данных
+    const cleanTelegramId = telegramId.trim().replace('@', '');
+    const cleanFullName = fullName.trim();
+    
+    // Валидация
+    if (!cleanTelegramId || !cleanFullName) {
       setError('Заполните все обязательные поля');
       return;
     }
     
+    // Валидация Telegram ID
+    if (!/^[a-zA-Z0-9_]{5,32}$/.test(cleanTelegramId)) {
+      setError('Telegram ID должен содержать 5-32 символа (латиница, цифры, подчеркивания)');
+      return;
+    }
+    
+    // Валидация ФИО
+    if (!/^[а-яА-ЯёЁa-zA-Z\s\-.]{2,100}$/.test(cleanFullName)) {
+      setError('ФИО должно содержать 2-100 символов (буквы, пробелы, дефисы)');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
     try {
+      // Проверка существующей регистрации
+      const alreadyRegistered = await checkExistingRegistration(cleanTelegramId);
+      if (alreadyRegistered) {
+        setError('Этот Telegram ID уже зарегистрирован на мероприятие');
+        setIsLoading(false);
+        return;
+      }
+
+      // Отправка данных
       const response = await fetch(`http://localhost:8000/api/events/${eventId}/guests/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          telegram_id: telegramId,
-          full_name: fullName
+          telegram_id: cleanTelegramId,
+          full_name: cleanFullName
         })
       });
 
-      const responseData = await response.json();
+      if (response.status === 409) {
+        setError('Пользователь с таким Telegram ID уже зарегистрирован');
+        return;
+      }
       
       if (!response.ok) {
-        throw new Error(
-          responseData.detail || 
-          responseData.message || 
-          `Ошибка ${response.status}: ${response.statusText}`
-        );
+        const errorData = await response.json();
+        throw new Error(errorData.detail || errorData.message || 'Ошибка регистрации');
       }
 
       setSuccess(true);
+      
+      // Сброс формы через 5 секунд
+      setTimeout(() => {
+        setTelegramId('');
+        setFullName('');
+        setSuccess(false);
+      }, 5000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Неизвестная ошибка');
+      setError(err instanceof Error ? err.message : 'Неизвестная ошибка сервера');
     } finally {
       setIsLoading(false);
     }
@@ -89,12 +141,35 @@ export function PublicGuestRegistrationPage() {
     );
   }
 
+  if (error && !eventTitle) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.errorMessage}>
+          <h2>Ошибка</h2>
+          <p>{error}</p>
+          <button 
+            className={styles.homeButton}
+            onClick={() => window.location.href = '/'}
+          >
+            На главную
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (success) {
     return (
       <div className={styles.container}>
         <div className={styles.successMessage}>
           <h2>Регистрация успешна!</h2>
-          <p>Вы успешно зарегистрированы на мероприятие.</p>
+          <p>Вы зарегистрированы на мероприятие: {eventTitle}</p>
+          <button 
+            className={styles.homeButton}
+            onClick={() => window.location.href = '/'}
+          >
+            Вернуться на главную
+          </button>
         </div>
       </div>
     );
@@ -122,10 +197,20 @@ export function PublicGuestRegistrationPage() {
                   type="text"
                   id="telegramId"
                   value={telegramId}
-                  onChange={(e) => setTelegramId(e.target.value)}
+                  onChange={(e) => {
+                    let value = e.target.value;
+                    // Автодобавление @
+                    if (value.length === 1 && !value.startsWith('@')) {
+                      value = '@' + value;
+                    }
+                    setTelegramId(value);
+                  }}
                   required
-                  placeholder="Ваш ID в Telegram"
+                  placeholder="@username"
+                  pattern="^@[a-zA-Z0-9_]{5,32}$"
+                  title="Формат: @username (5-32 символов, латиница, цифры, подчеркивание)"
                 />
+                <small>Пример: @my_telegram123</small>
               </div>
               
               <div className={styles.formGroup}>
@@ -136,8 +221,11 @@ export function PublicGuestRegistrationPage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
-                  placeholder="Ваше полное имя"
+                  placeholder="Иванов Иван Иванович"
+                  pattern="^[а-яА-ЯёЁa-zA-Z\s\-.]{2,100}$"
+                  title="Только буквы, пробелы и дефисы (2-100 символов)"
                 />
+                <small>Пример: Иванов Иван Иванович</small>
               </div>
               
               <button 
