@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Event, Menu, Guest
+from rest_framework.validators import UniqueValidator
 
 class MenuSerializer(serializers.ModelSerializer):
     
@@ -71,11 +72,22 @@ class EventBudgetSerializer(serializers.ModelSerializer):
 class GuestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Guest
-        fields = ['full_name', 'telegram_id']
+        fields = ['id', 'full_name', 'telegram_id']  # Добавили id для удаления
         extra_kwargs = {
-            'full_name': {'required': True},
-            'telegram_id': {'required': True}
+            'telegram_id': {
+                'validators': []  # Убрали глобальный UniqueValidator
+            }
         }
+
+    def validate(self, data):
+        event = self.context['view'].get_event()
+        telegram_id = data.get('telegram_id')
+        
+        if Guest.objects.filter(event=event, telegram_id=telegram_id).exists():
+            raise serializers.ValidationError(
+                {'telegram_id': 'Этот Telegram ID уже используется в данном мероприятии'}
+            )
+        return data
 
 class PollSettingsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -86,6 +98,8 @@ class PollSettingsSerializer(serializers.ModelSerializer):
             'poll_deadline': {'required': False}
         }
 
-
-
+class EventTitleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = ['title']
 

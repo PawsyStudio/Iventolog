@@ -1,8 +1,10 @@
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from .models import Event, Menu, Guest
-from .serializers import EventSerializer, EventUpdateSerializer, MenuSerializer, EventBudgetSerializer, GuestSerializer, PollSettingsSerializer
+from .serializers import EventSerializer, EventUpdateSerializer, MenuSerializer, EventBudgetSerializer, GuestSerializer, PollSettingsSerializer, EventTitleSerializer
 from rest_framework.renderers import JSONRenderer
+from rest_framework.exceptions import ValidationError
+from rest_framework import status
 
 class EventListCreateView(generics.ListCreateAPIView):
     renderer_classes = [JSONRenderer]  
@@ -103,22 +105,39 @@ class EventBudgetView(generics.RetrieveAPIView):
 # views.py
 class GuestListView(generics.ListCreateAPIView):
     serializer_class = GuestSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
-    def get_queryset(self):
-        return Guest.objects.filter(
-            event_id=self.kwargs['event_id'],
-            event__owner=self.request.user
-        )
-
-    def perform_create(self, serializer):
-        event = generics.get_object_or_404(
-            Event.objects.filter(owner=self.request.user),
+    def get_event(self):
+        return generics.get_object_or_404(
+            Event.objects.all(),
             pk=self.kwargs['event_id']
         )
+
+    def get_queryset(self):
+        if self.request.user.is_authenticated:
+            return Guest.objects.filter(event_id=self.kwargs['event_id'])
+        return Guest.objects.none()
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['event'] = self.get_event()
+        return context
+
+    def perform_create(self, serializer):
+        event = self.get_event()
         serializer.save(event=event)
         event.guests_count = Guest.objects.filter(event=event).count()
         event.save()
+
+class GuestRetrieveDestroyView(generics.RetrieveDestroyAPIView):
+    serializer_class = GuestSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        return Guest.objects.filter(
+            event__owner=self.request.user,
+            event_id=self.kwargs['event_id']
+        )
 
 class PollSettingsView(generics.RetrieveUpdateAPIView):
     serializer_class = PollSettingsSerializer
@@ -129,3 +148,11 @@ class PollSettingsView(generics.RetrieveUpdateAPIView):
             Event.objects.filter(owner=self.request.user),
             pk=self.kwargs['event_id']
         )
+
+class EventTitleView(generics.RetrieveAPIView):
+    serializer_class = EventTitleSerializer
+    permission_classes = [permissions.AllowAny]  
+    
+    def get_object(self):
+        event_id = self.kwargs.get('event_id')
+        return generics.get_object_or_404(Event, pk=event_id)
