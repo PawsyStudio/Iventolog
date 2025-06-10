@@ -65,10 +65,8 @@ class EventBudgetSerializer(serializers.ModelSerializer):
             'purchases_per_person', 'purchases_overall',
             'venue_per_person', 'venue_overall',
             'venue_type', 'venue_type_display',
-            'guests_count'
         ]
 
-# serializers.py
 class GuestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Guest

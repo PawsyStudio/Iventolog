@@ -128,16 +128,21 @@ class GuestListView(generics.ListCreateAPIView):
         serializer.save(event=event)
         event.guests_count = Guest.objects.filter(event=event).count()
         event.save()
-
 class GuestRetrieveDestroyView(generics.RetrieveDestroyAPIView):
     serializer_class = GuestSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get_queryset(self):
         return Guest.objects.filter(
             event__owner=self.request.user,
             event_id=self.kwargs['event_id']
         )
+
+    def perform_destroy(self, instance):
+        event = instance.event  # Получаем связанное событие
+        super().perform_destroy(instance)  # Удаляем гостя
+        event.guests_count = Guest.objects.filter(event=event).count()  # Обновляем счетчик
+        event.save()  # Сохраняем изменения
 
 class PollSettingsView(generics.RetrieveUpdateAPIView):
     serializer_class = PollSettingsSerializer
