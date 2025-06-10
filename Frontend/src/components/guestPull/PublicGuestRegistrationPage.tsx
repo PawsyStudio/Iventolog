@@ -1,0 +1,244 @@
+import { useState, useEffect } from 'react';
+import { useParams } from '@tanstack/react-router';
+import styles from './GuestRegistrationPage.module.css';
+
+export default function PublicGuestRegistrationPage() {
+  const { eventId } = useParams({ from: '/public/event/$eventId/guest-register' });
+  const [telegramId, setTelegramId] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [eventTitle, setEventTitle] = useState('');
+  const [isEventLoading, setIsEventLoading] = useState(true);
+
+  // Загрузка названия мероприятия
+  useEffect(() => {
+    const fetchEventTitle = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/api/events/${eventId}/title/`);
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            setError('Мероприятие не найдено');
+          } else {
+            setError('Ошибка загрузки мероприятия');
+          }
+          setIsEventLoading(false);
+          return;
+        }
+        
+        const data = await response.json();
+        setEventTitle(data.title);
+      } catch (err) {
+        setError('Сервер недоступен');
+      } finally {
+        setIsEventLoading(false);
+      }
+    };
+
+    fetchEventTitle();
+  }, [eventId]);
+
+  // Проверка существующей регистрации
+  const checkExistingRegistration = async (tgId: string) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/api/events/${eventId}/guests/exists?telegram_id=${encodeURIComponent(tgId)}`
+      );
+      
+      if (response.status === 200) {
+        const data = await response.json();
+        return data.exists;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (isLoading) return;
+    
+    // Очистка и нормализация данных
+    const cleanTelegramId = telegramId.trim().replace('@', '');
+    const cleanFullName = fullName.trim();
+    
+    // Валидация
+    if (!cleanTelegramId || !cleanFullName) {
+      setError('Заполните все обязательные поля');
+      return;
+    }
+    
+    // Валидация Telegram ID
+    if (!/^[a-zA-Z0-9_]{5,32}$/.test(cleanTelegramId)) {
+      setError('Telegram ID должен содержать 5-32 символа (латиница, цифры, подчеркивания)');
+      return;
+    }
+    
+    // Валидация ФИО
+    if (!/^[а-яА-ЯёЁa-zA-Z\s\-.]{2,100}$/.test(cleanFullName)) {
+      setError('ФИО должно содержать 2-100 символов (буквы, пробелы, дефисы)');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Проверка существующей регистрации
+      const alreadyRegistered = await checkExistingRegistration(cleanTelegramId);
+      if (alreadyRegistered) {
+        setError('Этот Telegram ID уже зарегистрирован на мероприятие');
+        setIsLoading(false);
+        return;
+      }
+
+      // Отправка данных
+      const response = await fetch(`http://localhost:8000/api/events/${eventId}/guests/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          telegram_id: cleanTelegramId,
+          full_name: cleanFullName
+        })
+      });
+
+      if (response.status === 409) {
+        setError('Пользователь с таким Telegram ID уже зарегистрирован');
+        return;
+      }
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || errorData.message || 'Ошибка регистрации');
+      }
+
+      setSuccess(true);
+      
+      // Сброс формы через 5 секунд
+      setTimeout(() => {
+        setTelegramId('');
+        setFullName('');
+        setSuccess(false);
+      }, 5000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Неизвестная ошибка сервера');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isEventLoading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loadingMessage}>Загрузка мероприятия...</div>
+      </div>
+    );
+  }
+
+  if (error && !eventTitle) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.errorMessage}>
+          <h2>Ошибка</h2>
+          <p>{error}</p>
+          <button 
+            className={styles.homeButton}
+            onClick={() => window.location.href = '/'}
+          >
+            На главную
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (success) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.successMessage}>
+          <h2>Регистрация успешна!</h2>
+          <p>Вы зарегистрированы на мероприятие: {eventTitle}</p>
+          <button 
+            className={styles.homeButton}
+            onClick={() => window.location.href = '/'}
+          >
+            Вернуться на главную
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.formWrapper}>
+        <h2>Регистрация на мероприятие: {eventTitle}</h2>
+        
+        {error ? (
+          <div className={styles.error}>
+            {error}
+            <button onClick={() => setError(null)} className={styles.retryButton}>
+              Попробовать снова
+            </button>
+          </div>
+        ) : (
+          <>
+            <p>Пожалуйста, введите ваши данные:</p>
+            <form onSubmit={handleSubmit}>
+              <div className={styles.formGroup}>
+                <label htmlFor="telegramId">Telegram ID *</label>
+                <input
+                  type="text"
+                  id="telegramId"
+                  value={telegramId}
+                  onChange={(e) => {
+                    let value = e.target.value;
+                    // Автодобавление @
+                    if (value.length === 1 && !value.startsWith('@')) {
+                      value = '@' + value;
+                    }
+                    setTelegramId(value);
+                  }}
+                  required
+                  placeholder="@username"
+                  pattern="^@[a-zA-Z0-9_]{5,32}$"
+                  title="Формат: @username (5-32 символов, латиница, цифры, подчеркивание)"
+                />
+                <small>Пример: @my_telegram123</small>
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label htmlFor="fullName">ФИО *</label>
+                <input
+                  type="text"
+                  id="fullName"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                  placeholder="Иванов Иван Иванович"
+                  pattern="^[а-яА-ЯёЁa-zA-Z\s\-.]{2,100}$"
+                  title="Только буквы, пробелы и дефисы (2-100 символов)"
+                />
+                <small>Пример: Иванов Иван Иванович</small>
+              </div>
+              
+              <button 
+                type="submit" 
+                className={styles.submitButton}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Регистрация...' : 'Зарегистрироваться'}
+              </button>
+            </form>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

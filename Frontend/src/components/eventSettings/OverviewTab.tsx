@@ -251,14 +251,22 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
                 value={formParams.venue_type}
                 onChange={(e) => handleParamChange('venue_type', e.target.value)}
               >
-                <option value="OWN">Своё помещение</option>
-                <option value="RENTED">Аренда</option>
+                <option value="OWN">Своё</option>
+                <option value="RENTED">Съёмное</option>
               </select>
             ) : (
               currentEvent.venue_type === 'OWN' ? 'Своё' : 'Съёмное'
             )}
           </li>
           
+          {/* Блок для отображения цены аренды в режиме просмотра */}
+          {currentEvent.venue_type === 'RENTED' && !isEditingParams && (
+            <li>
+              Цена за аренду: {Number(currentEvent.venue_cost).toLocaleString('ru-RU')} RUB
+            </li>
+          )}
+          
+          {/* Блок для редактирования цены аренды */}
           {formParams.venue_type === 'RENTED' && isEditingParams && (
             <li>
               Цена за аренду: 

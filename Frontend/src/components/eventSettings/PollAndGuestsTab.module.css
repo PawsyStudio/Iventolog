@@ -1,0 +1,179 @@
+.container {
+  display: flex;
+  gap: 2rem;
+  padding: 1rem;
+}
+
+.pollBlock, .guestsBlock {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.pollBlock {
+  flex: 1;
+}
+
+.guestsBlock {
+  flex: 2;
+}
+
+.settingRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.settingRow label {
+  font-weight: 500;
+  margin-right: 1rem;
+  min-width: 250px;
+}
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.editButton {
+  background-color: #3498db;
+  color: white;
+}
+
+.saveButton {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.cancelButton {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.deleteButton {
+  background-color: #e74c3c;
+  color: white;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.9rem;
+}
+
+.guestsTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.guestsTable th, .guestsTable td {
+  padding: 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.guestsTable th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+/* Стили для переключателя */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.error {
+  background-color: #ffebee;
+  color: #b71c1c;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.error button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #b71c1c;
+}
+
+.linkContainer {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.linkInput {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.copyButton {
+  padding: 0.5rem 1rem;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.copyButton:hover {
+  background-color: #2980b9;
+}
