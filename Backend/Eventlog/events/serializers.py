@@ -72,10 +72,10 @@ class EventBudgetSerializer(serializers.ModelSerializer):
 class GuestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Guest
-        fields = ['id', 'full_name', 'telegram_id']  # Добавили id для удаления
+        fields = ['id', 'full_name', 'telegram_id']
         extra_kwargs = {
             'telegram_id': {
-                'validators': []  # Убрали глобальный UniqueValidator
+                'validators': []
             }
         }
 
