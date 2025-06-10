@@ -150,7 +150,7 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
     
     try {
       const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:8000/api/events/${eventId}/guests/${guestId}`, {
+        const response = await fetch(`http://localhost:8000/api/events/${eventId}/guests/${guestId}/`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
