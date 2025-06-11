@@ -22,6 +22,25 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Конвертация UTC в локальное время для input
+  const convertUTCToLocal = (utcDate: string) => {
+    if (!utcDate) return '';
+    const date = new Date(utcDate);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
+  // Конвертация локального времени в UTC для сервера
+  const convertLocalToUTC = (localDate: string) => {
+    if (!localDate) return '';
+    const date = new Date(localDate);
+    return date.toISOString();
+  };
+
   // Загрузка настроек опроса
   const fetchPollSettings = async () => {
     try {
@@ -49,8 +68,6 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
       }
       
       const data = await response.json();
-      
-      // Убираем поле guests_count при сохранении в состояние
       const { guests_count, ...settings } = data;
       setPollSettings(settings);
       setTempSettings(settings);
@@ -102,6 +119,21 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
       }
 
       setIsLoading(true);
+      
+      // Проверяем, было ли изменение времени
+      const originalLocal = convertUTCToLocal(pollSettings.poll_deadline);
+      const hasChanged = originalLocal !== tempSettings.poll_deadline;
+      
+      // Если время не изменилось, просто выходим из режима редактирования
+      if (!hasChanged) {
+        setIsEditing(false);
+        setIsLoading(false);
+        return;
+      }
+
+      // Конвертируем локальное время в UTC перед отправкой
+      const utcDeadline = convertLocalToUTC(tempSettings.poll_deadline);
+      
       const response = await fetch(`http://localhost:8000/api/events/${eventId}/poll/`, {
         method: 'PATCH',
         headers: {
@@ -109,7 +141,7 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          poll_deadline: tempSettings.poll_deadline
+          poll_deadline: utcDeadline
         })
       });
 
@@ -119,7 +151,6 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
       }
 
       const updatedSettings = await response.json();
-      // Убираем guests_count из полученных данных
       const { guests_count, ...settings } = updatedSettings;
       setPollSettings(settings);
       setIsEditing(false);
@@ -134,6 +165,16 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
   const handleCancel = () => {
     setTempSettings({...pollSettings});
     setIsEditing(false);
+  };
+
+  // Активация режима редактирования с конвертацией времени
+  const handleEdit = () => {
+    setIsEditing(true);
+    // Конвертируем UTC в локальное время для редактирования
+    setTempSettings({
+      ...pollSettings,
+      poll_deadline: convertUTCToLocal(pollSettings.poll_deadline)
+    });
   };
 
   // Удаление гостя
@@ -153,14 +194,12 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
         throw new Error('Ошибка удаления гостя');
       }
       
-      // Обновляем данные
       fetchGuests();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка сервера');
     }
   };
 
-  // Ссылка для регистрации гостей
   const registrationLink = `${window.location.origin}/public/event/${eventId}/guest-register`;
 
   if (isLoading) {
@@ -185,7 +224,6 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
         
         <div className={styles.settingRow}>
           <label>Зарегистрировано гостей:</label>
-          {/* Используем длину массива гостей вместо guests_count */}
           <span>{guests.length}</span>
         </div>
         
@@ -228,7 +266,7 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
           {!isEditing ? (
             <button 
               className={styles.editButton}
-              onClick={() => setIsEditing(true)}
+              onClick={handleEdit}
               disabled={isLoading}
             >
               Редактировать
@@ -255,7 +293,6 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
       </div>
 
       <div className={styles.guestsBlock}>
-        {/* Используем длину массива гостей вместо guests_count */}
         <h2>Список гостей ({guests.length})</h2>
         
         {guests.length > 0 ? (
