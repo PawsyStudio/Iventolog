@@ -146,13 +146,11 @@ class GuestRetrieveDestroyView(generics.RetrieveDestroyAPIView):
 
 class PollSettingsView(generics.RetrieveUpdateAPIView):
     serializer_class = PollSettingsSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def get_object(self):
-        return generics.get_object_or_404(
-            Event.objects.filter(owner=self.request.user),
-            pk=self.kwargs['event_id']
-        )
+        event_id = self.kwargs.get('event_id')
+        return generics.get_object_or_404(Event, pk=event_id)
 
 class EventTitleView(generics.RetrieveAPIView):
     serializer_class = EventTitleSerializer
