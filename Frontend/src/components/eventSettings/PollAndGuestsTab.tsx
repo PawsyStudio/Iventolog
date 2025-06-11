@@ -8,13 +8,11 @@ interface Guest {
 }
 
 interface PollSettings {
-  allow_menu_selection: boolean;
   poll_deadline: string;
 }
 
 export function PollAndGuestsTab({ eventId }: { eventId: string }) {
   const [pollSettings, setPollSettings] = useState<PollSettings>({
-    allow_menu_selection: false,
     poll_deadline: '',
   });
   
@@ -94,14 +92,6 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
     fetchGuests();
   }, [eventId]);
 
-  // Обработчик изменений настроек
-  const handleSettingChange = (field: keyof PollSettings, value: string | boolean) => {
-    setTempSettings(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
   // Сохранение настроек
   const handleSave = async () => {
     try {
@@ -119,7 +109,6 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          allow_menu_selection: tempSettings.allow_menu_selection,
           poll_deadline: tempSettings.poll_deadline
         })
       });
@@ -195,19 +184,6 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
         <h2>Опрос</h2>
         
         <div className={styles.settingRow}>
-          <label>Право на выбор меню:</label>
-          <label className={styles.switch}>
-            <input 
-              type="checkbox" 
-              checked={tempSettings.allow_menu_selection}
-              onChange={(e) => handleSettingChange('allow_menu_selection', e.target.checked)}
-              disabled={!isEditing}
-            />
-            <span className={styles.slider}></span>
-          </label>
-        </div>
-        
-        <div className={styles.settingRow}>
           <label>Зарегистрировано гостей:</label>
           {/* Используем длину массива гостей вместо guests_count */}
           <span>{guests.length}</span>
@@ -219,7 +195,7 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
             <input
               type="datetime-local"
               value={tempSettings.poll_deadline}
-              onChange={(e) => handleSettingChange('poll_deadline', e.target.value)}
+              onChange={(e) => setTempSettings({...tempSettings, poll_deadline: e.target.value})}
             />
           ) : (
             <span>{pollSettings.poll_deadline ? new Date(pollSettings.poll_deadline).toLocaleString() : 'Не установлена'}</span>
