@@ -41,7 +41,7 @@ export default function PublicGuestRegistrationPage() {
     const fetchPollDeadline = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8000/api/public/events/${eventId}/poll_settings/`
+          `http://localhost:8000/api/events/${eventId}/poll_settings/`
         );
         
         if (response.status === 404) {
