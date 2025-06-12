@@ -1,6 +1,6 @@
 import styles from './aboutBlock.module.css';
-import eyeImage from '../../assets/images/decoration/eye.png';
-import frameImage from '../../assets/images/decoration/frameAbout.png';
+import eyeImage from '../../../assets/images/decoration/eye.png';
+import frameImage from '../../../assets/images/decoration/frameAbout.png';
 
 export default function AboutBlock() {
   return (

@@ -1,4 +1,4 @@
-import HomeLogo from '../../../assets/images/logos/iventolog.svg';
+import HomeLogo from '../../../../assets/images/logos/iventologHeader.svg';
 import InfoScroll from '../infoButton/InfoButton.tsx';
 import AboutScroll from '../aboutButton/AboutButton.tsx';
 import CreateButton from '../createButton/CreateButton.tsx';

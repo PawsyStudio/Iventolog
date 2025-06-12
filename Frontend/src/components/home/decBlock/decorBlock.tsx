@@ -1,5 +1,5 @@
 import styles from './decorBlock.module.css';
-import decorImage from '../../assets/images/decoration/decor1.png';
+import decorImage from '../../../assets/images/decoration/decor1.png';
 
 export default function DecorBlock() {
   return (
