@@ -3,7 +3,7 @@ import { useAuthStore } from '@/store/AuthStore';
 import { CreateEventForm } from '@/components/CreateEventForm';
 import { EventList } from '@/components/eventList/EventList';
 import { useEvents } from '@/hooks/useEvents';
-import Header from '@/components/headPack/appHeader/AppHeader';
+import Header from '@/components/headerPackApp/AppHeader';
 import Footer from '@/components/footer/Footer';
 
 export function EventsPage() {

@@ -2,7 +2,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { useAuthStore } from '@/store/AuthStore';
 import { useAuthRedirect } from '@/hooks/useAuthRedirect';
 
-import Header from '@/components/headPack/homeHeader/HomeHeader';
+import Header from '@/components/headPackHome/homeHeader/HomeHeader';
 import Footer from '@/components/footer/Footer';
 import LogoutButton from '@/components/logoutButton/LogoutButton';
 import DecorBlock from '@/components/decBlock/decorBlock';

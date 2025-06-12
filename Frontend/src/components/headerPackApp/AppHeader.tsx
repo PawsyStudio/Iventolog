@@ -1,4 +1,4 @@
-import HomeLogo from '../../../assets/images/logos/app-logo.png';
+import HomeLogo from '../../assets/images/logos/iventolog.svg';
 import styles from './appheader.module.css';
 export default function Header() {
 

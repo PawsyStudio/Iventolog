@@ -1,0 +1,21 @@
+.CreateButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 116px;
+  height: 44px;
+  color: white; /* Изменён цвет текста для контраста */
+  background: #1471CD; /* Требуемый фон */
+  border-radius: 15px; /* Закругление углов */
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 700;
+  text-decoration: none; /* Убираем подчёркивание */
+  transition: background 0.2s ease; /* Плавное изменение фона */
+  border: none; /* Убираем стандартную рамку */
+}
+
+/* Эффект при наведении */
+.CreateButton:hover {
+  background: #0d5ca6;
+}

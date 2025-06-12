@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams } from '@tanstack/react-router';
 import { useEvent } from '@/hooks/useEvent';
-import Header from '@/components/headPack/appHeader/AppHeader';
+import Header from '@/components/headerPackApp/AppHeader';
 import Footer from '@/components/footer/Footer';
 import LogoutButton from '@/components/logoutButton/LogoutButton';
 import { OverviewTab } from '@/components/eventSettings/OverviewTab';

@@ -1,4 +1,4 @@
-import HomeLogo from '../../../assets/images/logos/home-logo.png';
+import HomeLogo from '../../../assets/images/logos/iventolog.svg';
 import InfoScroll from '../infoButton/InfoButton.tsx';
 import AboutScroll from '../aboutButton/AboutButton.tsx';
 import CreateButton from '../createButton/CreateButton.tsx';
@@ -8,9 +8,11 @@ export default function Header() {
     return(
         <header className={styles.header}>
             <img src={HomeLogo} alt="logo" className={styles.logo} />
-            <InfoScroll />
+            <div className={styles.buttonGroup}>
+                <InfoScroll />
+                <AboutScroll />
+            </div>   
             <CreateButton />
-            <AboutScroll />
         </header>
     )
 }
