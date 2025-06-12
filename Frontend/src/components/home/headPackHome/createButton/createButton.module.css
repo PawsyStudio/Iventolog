@@ -4,18 +4,42 @@
   justify-content: center;
   width: 116px;
   height: 44px;
-  color: white; /* Изменён цвет текста для контраста */
-  background: #1471CD; /* Требуемый фон */
-  border-radius: 15px; /* Закругление углов */
+  color: white;
+  background: #1471CD;
+  border-radius: 15px;
   cursor: pointer;
   font-size: 20px;
   font-weight: 700;
-  text-decoration: none; /* Убираем подчёркивание */
-  transition: background 0.2s ease; /* Плавное изменение фона */
-  border: none; /* Убираем стандартную рамку */
+  text-decoration: none;
+  transition: background 0.2s ease;
+  border: none;
 }
 
-/* Эффект при наведении */
+/* hover для базовой кнопки */
 .CreateButton:hover {
   background: #0d5ca6;
+}
+
+.hero {
+  width: 179px;
+  height: 68px;
+  font-size: 36px;
+  font-weight: 700;
+  color: #1E90FF;
+  background-color: white;
+  border-radius: 7px;
+  border: 1px solid #1E90FF;
+  box-shadow: 0 4px 0 rgba(30, 144, 255, 0.4);
+  transition: box-shadow 0.2s ease, color 0.2s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* hover — цвет текста белый */
+.hero:hover {
+  color: #ffffff;
+  box-shadow: 0 4px 8px rgba(30, 144, 255, 0.4);
 }

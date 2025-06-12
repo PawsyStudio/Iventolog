@@ -1,70 +1,114 @@
-/* Основной блок */
 .decorBlock {
   position: relative;
   width: 100%;
-  height: 872px;
-  background-color: rgba(0, 129, 255, 0.3);
+  height: 846px;
+  background-color: #031525;
   overflow: hidden;
+  user-select: none;
 }
 
-/* Группа текстов */
-.textGroup {
+.background {
   position: absolute;
-  top: 142px;
-  left: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 35px;
-  text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url('../../../assets/images/decoration/background-1.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  filter: blur(8px);
+  opacity: 1;
+  z-index: 0;
+  pointer-events: none;
 }
 
-/* Контейнер для строки */
-.lineContainer {
-  display: flex;
-  align-items: center;
-}
-
-/* Общие стили текста */
-.text {
-  font-family: 'Unbounded', sans-serif;
-  font-weight: 500;
-  font-size: 64px;
-  color: white;
-  margin-left: 12px;
-  white-space: nowrap;
-  position: relative;
+.triangle1,
+.triangle2,
+.triangle3,
+.triangle4,
+.down,
+.logo {
+  position: absolute;
   z-index: 2;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  cursor: default;
 }
 
-.rectangle1 {
-  width: 240px;
-  height: 39px;
-  background-color: #1E90FF;
-  border-radius: 21px;
-  margin-left: -24px;
+/* Треугольники */
+.triangle1 {
+  top: 160px;
+  left: 200px;
+}
+.triangle2 {
+  bottom: 105px;
+  left: 158px;
+}
+.triangle3 {
+  bottom: 34px;
+  right: 174px;
+}
+.triangle4 {
+  bottom: 127px;
+  right: 232px;
 }
 
-.rectangle2 {
-  width: 286px;
-  height: 39px;
-  background-color: rgba(30, 144, 255, 0.66);
-  border-radius: 21px;
-  margin-left: -11px;
+/* Стрелка вниз */
+.down {
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
-.rectangle3 {
-  width: 368px;
-  height: 39px;
-  background-color: rgba(30, 144, 255, 0.6);
-  border-radius: 21px;
-  margin-left: -11px;
+/* Центральный логотип */
+.logo {
+  top: 200px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
-.decorImage {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 950px;
-  height: auto;
-  object-fit: contain;
+.content {
+  position: relative;
+  z-index: 3;
+  padding-top: 360px;
+  width: 100%;
+  max-width: 100%;
+  padding-left: 50px;
+  padding-right: 50px;
+  box-sizing: border-box;
+  color: #ffffff;
+  user-select: text;
+  text-align: center; /* Центрируем текст */
+}
+
+.heading {
+  font-size: 40px;
+  font-weight: 900;
+  line-height: 1.2;
+  margin-bottom: 20px;
+  white-space: nowrap;
+}
+
+.accent {
+  color: #1E90FF;
+}
+
+.subheading {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 20px;
+  white-space: nowrap;
+}
+
+.callToAction {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1E90FF;
+  white-space: nowrap;
+}
+
+.buttonWrapper {
+  margin-top: 100px;
 }

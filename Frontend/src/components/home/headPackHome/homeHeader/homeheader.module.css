@@ -47,3 +47,12 @@
     text-align: center;
     color: white;
 }
+
+.logo {
+  user-select: none;           /* Запрет выделения */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-drag: none;     /* Запрет перетаскивания */
+  cursor: default;             /* Курсор без выделения */
+}

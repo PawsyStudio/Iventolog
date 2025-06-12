@@ -1,8 +1,13 @@
 import { Link } from '@tanstack/react-router';
 import { useAuthStore } from '@/store/AuthStore';
 import styles from './CreateButton.module.css';
+import clsx from 'clsx';
 
-export default function CreateButton() {
+interface CreateButtonProps {
+  variant?: 'default' | 'hero';
+}
+
+export default function CreateButton({ variant = 'default' }: CreateButtonProps) {
   const { isAuth, showAuthModal } = useAuthStore();
 
   const handleClick = (e: React.MouseEvent) => {
@@ -15,10 +20,12 @@ export default function CreateButton() {
   return (
     <Link 
       to='/events'
-      className={styles.CreateButton}
+      className={clsx(styles.CreateButton, {
+        [styles.hero]: variant === 'hero',
+      })}
       onClick={handleClick}
     >
-     create
+      create
     </Link>
   );
 }

@@ -12,7 +12,7 @@ export default function Header() {
                 <InfoScroll />
                 <AboutScroll />
             </div>   
-            <CreateButton />
+            <CreateButton variant="default" />
         </header>
     )
 }
