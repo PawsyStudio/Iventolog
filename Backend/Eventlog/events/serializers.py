@@ -65,10 +65,8 @@ class EventBudgetSerializer(serializers.ModelSerializer):
             'purchases_per_person', 'purchases_overall',
             'venue_per_person', 'venue_overall',
             'venue_type', 'venue_type_display',
-            'guests_count'
         ]
 
-# serializers.py
 class GuestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Guest
@@ -92,9 +90,8 @@ class GuestSerializer(serializers.ModelSerializer):
 class PollSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
-        fields = ['allow_menu_selection', 'poll_deadline']
+        fields = ['poll_deadline']
         extra_kwargs = {
-            'allow_menu_selection': {'required': False},
             'poll_deadline': {'required': False}
         }
 

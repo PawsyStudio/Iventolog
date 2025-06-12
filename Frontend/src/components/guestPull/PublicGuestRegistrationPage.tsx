@@ -11,9 +11,13 @@ export default function PublicGuestRegistrationPage() {
   const [success, setSuccess] = useState(false);
   const [eventTitle, setEventTitle] = useState('');
   const [isEventLoading, setIsEventLoading] = useState(true);
+  const [pollDeadline, setPollDeadline] = useState<string | null>(null);
+  const [isPollClosed, setIsPollClosed] = useState(false);
 
-  // Загрузка названия мероприятия
+  // Загрузка данных мероприятия
   useEffect(() => {
+    let isMounted = true;
+
     const fetchEventTitle = async () => {
       try {
         const response = await fetch(`http://localhost:8000/api/events/${eventId}/title/`);
@@ -24,21 +28,67 @@ export default function PublicGuestRegistrationPage() {
           } else {
             setError('Ошибка загрузки мероприятия');
           }
-          setIsEventLoading(false);
           return;
         }
         
         const data = await response.json();
-        setEventTitle(data.title);
+        if (isMounted) setEventTitle(data.title);
       } catch (err) {
-        setError('Сервер недоступен');
-      } finally {
-        setIsEventLoading(false);
+        if (isMounted) setError('Сервер недоступен');
       }
     };
 
-    fetchEventTitle();
+    const fetchPollDeadline = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8000/api/events/${eventId}/poll/`
+        );
+        
+        if (response.status === 404) {
+          // Настройки опроса не найдены - считаем регистрацию открытой
+          return;
+        }
+        
+        if (!response.ok) {
+          throw new Error('Ошибка загрузки настроек опроса');
+        }
+        
+        const data = await response.json();
+        if (isMounted) setPollDeadline(data.poll_deadline);
+      } catch (err) {
+        console.error('Ошибка загрузки дедлайна:', err);
+      }
+    };
+
+    const loadData = async () => {
+      setIsEventLoading(true);
+      setError(null);
+      
+      try {
+        await Promise.all([fetchEventTitle(), fetchPollDeadline()]);
+      } finally {
+        if (isMounted) setIsEventLoading(false);
+      }
+    };
+
+    loadData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [eventId]);
+
+  // Проверка актуальности дедлайна
+  useEffect(() => {
+    if (!pollDeadline) return;
+    
+    const now = new Date();
+    const deadline = new Date(pollDeadline);
+    
+    if (now > deadline) {
+      setIsPollClosed(true);
+    }
+  }, [pollDeadline]);
 
   // Проверка существующей регистрации
   const checkExistingRegistration = async (tgId: string) => {
@@ -60,7 +110,7 @@ export default function PublicGuestRegistrationPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (isLoading) return;
+    if (isLoading || isPollClosed) return;
     
     // Очистка и нормализация данных
     const cleanTelegramId = telegramId.trim().replace('@', '');
@@ -147,6 +197,23 @@ export default function PublicGuestRegistrationPage() {
         <div className={styles.errorMessage}>
           <h2>Ошибка</h2>
           <p>{error}</p>
+          <button 
+            className={styles.homeButton}
+            onClick={() => window.location.href = '/'}
+          >
+            На главную
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (isPollClosed) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.closedMessage}>
+          <h2>Регистрация закрыта</h2>
+          <p>К сожалению, срок регистрации на мероприятие истек.</p>
           <button 
             className={styles.homeButton}
             onClick={() => window.location.href = '/'}

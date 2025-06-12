@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import type { Event } from '@/types/event';
 import styles from './OverviewTab.module.css';
 
@@ -14,10 +14,7 @@ interface BudgetData {
 export function OverviewTab({ event: initialEvent }: { event: Event }) {
   const [currentEvent, setCurrentEvent] = useState(initialEvent);
   const [isEditingParams, setIsEditingParams] = useState(false);
-  const [guestsCount, setGuestsCount] = useState(initialEvent.guests_count || 0);
-  const [isEditingGuests, setIsEditingGuests] = useState(false);
   const [budgetData, setBudgetData] = useState<BudgetData | null>(null);
-  const guestsInputRef = useRef<HTMLInputElement>(null);
   
   // Форма для редактирования параметров
   const [formParams, setFormParams] = useState({
@@ -27,6 +24,9 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
     event_date: initialEvent.event_date ? 
       new Date(initialEvent.event_date).toISOString().slice(0, 16) : ''
   });
+
+  // Динамическое количество гостей
+  const guestsCount = currentEvent.guests_count || 0;
 
   // Загрузка данных бюджета
   const fetchBudget = async () => {
@@ -50,7 +50,6 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
   // Обновление состояний при изменении initialEvent
   useEffect(() => {
     setCurrentEvent(initialEvent);
-    setGuestsCount(initialEvent.guests_count || 0);
     setFormParams({
       title: initialEvent.title,
       venue_type: initialEvent.venue_type,
@@ -60,55 +59,6 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
     });
     fetchBudget();
   }, [initialEvent]);
-
-  // Фокус на поле ввода гостей при активации
-  useEffect(() => {
-    if (isEditingGuests && guestsInputRef.current) {
-      guestsInputRef.current.focus();
-    }
-  }, [isEditingGuests]);
-
-  // Обновление количества гостей
-  const updateGuestsCount = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        window.location.href = '/login';
-        return;
-      }
-
-      const response = await fetch(`http://localhost:8000/api/events/${initialEvent.id}/`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ guests_count: guestsCount })
-      });
-
-      if (!response.ok) throw new Error('Ошибка обновления');
-      
-      const updatedEvent = await response.json();
-      setCurrentEvent(updatedEvent);
-      setIsEditingGuests(false);
-      fetchBudget();
-      
-    } catch (error) {
-      console.error('Ошибка:', error);
-      setGuestsCount(currentEvent.guests_count || 0);
-      setIsEditingGuests(false);
-    }
-  };
-
-  // Обработчик нажатия клавиш для поля гостей
-  const handleGuestsKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      updateGuestsCount();
-    } else if (e.key === 'Escape') {
-      setGuestsCount(currentEvent.guests_count || 0);
-      setIsEditingGuests(false);
-    }
-  };
 
   // Обновление основных параметров
   const updateEventParams = async () => {
@@ -188,27 +138,7 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
       <div className={styles.summary}>
         <h2>Сводка по мероприятию:</h2>
         <ul className={styles.list}>
-          <li>
-            Количество гостей: 
-            {isEditingGuests ? (
-              <input
-                ref={guestsInputRef}
-                type="number"
-                className={styles.guestsInput}
-                value={guestsCount}
-                onChange={(e) => setGuestsCount(Number(e.target.value))}
-                onKeyDown={handleGuestsKeyDown}
-                min="0"
-              />
-            ) : (
-              <span 
-                className={styles.editableValue}
-                onClick={() => setIsEditingGuests(true)}
-              >
-                {guestsCount}
-              </span>
-            )}
-          </li>
+          <li>Количество гостей: {guestsCount}</li>
           <li>Сумма с человека: {budgetData ? `${budgetData.total_per_person.toFixed(2)} RUB` : 'Загрузка...'}</li>
           <li>Итоговая сумма: {budgetData ? `${budgetData.total_overall.toFixed(2)} RUB` : 'Загрузка...'}</li>
         </ul>
