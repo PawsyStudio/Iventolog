@@ -6,7 +6,6 @@
   overflow: hidden;
 }
 
-/* Добавляем треугольный фон */
 .aboutBlock::after {
   content: '';
   position: absolute;
@@ -19,16 +18,14 @@
   z-index: 0;
 }
 
-.aboutTitle {
-  font-family: 'Unbounded', sans-serif;
-  font-weight: 500;
-  font-size: 32px;
-  color: #1E90FF;
-  text-align: center;
-  margin: 36px 0 22px;
-  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
-  position: relative;
-  z-index: 2; /* Поднимаем над фоном */
+.down {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  pointer-events: none;
+  user-select: none;
 }
 
 .contentWrapper {
@@ -36,7 +33,8 @@
   margin: 0 auto;
   width: calc(100% - 54px);
   max-width: 1200px;
-  z-index: 1; /* Поднимаем над фоном */
+  z-index: 1;
+  margin-top: 122px; /* отступ сверху */
 }
 
 .frameImage {
@@ -50,19 +48,22 @@
   font-weight: 700;
   font-size: 20px;
   color: white;
-  white-space: pre; /* Важно! Сохраняет ВСЕ пробелы и переносы */
-  word-break: keep-all; /* Запрещает перенос слов */
-  overflow: visible; /* Разрешаем выход за границы */
-  width: max-content; /* Ширина по содержимому */
+  line-height: 1.5;
+
+  white-space: normal;        /* разрешаем автоматические переносы */
+  word-break: break-word;     /* перенос слов при необходимости */
+  width: 100%;
+  max-width: 780px;           /* ограничение ширины для читаемости */
+  text-align: left;
+
   margin: 0 0 20px;
-  line-height: 1.3;
 }
 
 .textContent {
   position: absolute;
-  top: 80px;
-  left: calc(45px + 392px);
-  width: auto; /* Ширина по содержимому */
+  top: 60px;
+  left: calc(20px + 392px);
+  width: auto;
   color: white;
   overflow: visible;
 }
@@ -89,20 +90,22 @@
   margin: 0;
 }
 
-.eyeImage {
+.logoContainer {
   position: absolute;
-  width: 392px; /* Фиксированный размер по ТЗ */
-  height: 392px;
-  top: 50px;    /* Отступ от верхнего края рамки */
-  left: 45px;   /* Отступ от левого края рамки */
-  object-fit: contain;
-
-  /* Гарантируем, что не выйдет за рамку */
-  max-width: calc(100% - 158px - 20px); /* 158px слева + 20px справа */
-  max-height: calc(100% - 73px - 20px); /* 73px сверху + 20px снизу */
+  width: 265px;
+  height: 265px;
+  top: 50px;
+  left: 45px;
+  border-radius: 51px;
+  overflow: hidden; /* Важно! */
 }
 
-/* ✨ Декоративный текст ABOUT US */
+.teamLogo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* или contain, в зависимости от нужного эффекта */
+}
+
 .decorativeAboutUs {
   position: absolute;
   top: 69px;
