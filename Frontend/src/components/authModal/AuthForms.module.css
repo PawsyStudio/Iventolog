@@ -1,10 +1,11 @@
+/* AuthForms.module.css */
 .authModalOverlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -12,62 +13,167 @@
 }
 
 .authModal {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  width: 100%;
-  max-width: 400px;
+  background: #081a2b;
+  padding: 40px 60px;
+  border-radius: 16px;
+  width: 792px;
   position: relative;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: height 0.3s ease;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Основное изменение: размер шрифта заголовка */
+.modalTitle {
+  color: #ffffff;
+  font-size: 40px; /* Увеличенный размер шрифта */
+  font-weight: 400; /* Regular weight */
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.headerActions {
+  display: flex;
+  gap: 25px;
+  align-items: center;
+}
+
+.switchButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.switchButton:hover {
+  background: #4da6ff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.switchButton:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .closeButton {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: 32px;
   cursor: pointer;
-  color: #666;
-}
-
-.tabs {
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.3s ease;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+  width: 40px;
+  height: 40px;
   display: flex;
-  margin-bottom: 1.5rem;
-  border-bottom: 1px solid #eee;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
 }
 
-.tabButton {
-  flex: 1;
-  padding: 1rem;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-size: 1rem;
-  color: #666;
-}
-
-.tabButton.active {
-  color: #007bff;
-  border-bottom: 2px solid #007bff;
+.closeButton:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .formContainer {
-  margin-top: 1rem;
+  margin-top: 20px;
 }
 
-/* AuthForms.module.css */
-.formGroup input[type="text"] {
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-  margin-top: 0.5rem;
+/* Стили для полей ввода */
+.formGroup {
+  margin-bottom: 25px;
+}
+
+.formGroup input[type="text"],
+.formGroup input[type="email"],
+.formGroup input[type="password"] {
+  width: 100%;
+  padding: 16px 20px;
+  border: 1px #0c8ce9 solid;
+  border-radius: 8px;
+  font-size: 16px;
+  background: rgba(0, 0, 0, 0.2);
+  color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.formGroup input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .formGroup input:focus {
-  border-color: #007bff;
+  border-color: #4da6ff;
   outline: none;
-  box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+  box-shadow: 0 0 0 3px rgba(77, 166, 255, 0.3);
+}
+
+/* Кнопки отправки формы */
+.submitButton {
+  width: 100%;
+  padding: 18px;
+  background: linear-gradient(135deg, #1e90ff, #0066cc);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+  letter-spacing: 0.5px;
+}
+
+.submitButton:hover {
+  background: linear-gradient(135deg, #4da6ff, #0077e6);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Дополнительные элементы форм */
+.formFooter {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.rememberMe {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rememberMe input {
+  width: 18px;
+  height: 18px;
+}
+
+.forgotPassword {
+  color: #4da6ff;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.forgotPassword:hover {
+  color: #70b8ff;
+  text-decoration: underline;
 }
