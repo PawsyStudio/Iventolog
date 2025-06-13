@@ -1,0 +1,74 @@
+.infoBlock {
+  position: relative;
+  width: 100%;
+  height: 865px;
+  background-color: #071624;
+  overflow: hidden;
+}
+
+.triangleBackground {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  background-color: #2f3c47;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+/* SVG рамка */
+.svgFrame {
+  position: absolute;
+  top: 89px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Обёртка текста поверх рамки */
+.textWrapper {
+  position: absolute;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.textOne {
+  color: white;
+  margin-bottom: -5px;
+  font-size: 36px;
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 500;
+  margin-left: 70px; /* ⬅️ сместить влево, настрой значение */
+  align-self: flex-start;
+}
+
+.textTwo {
+  color: #1e90ff;
+  font-size: 36px;
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 500;
+  margin-right: 70px; /* ➡️ сместить вправо, настрой значение */
+  align-self: flex-end;
+}
+
+/* ✨ Декоративный текст INFORMATION */
+.decorativeLabel {
+  position: absolute;
+  top: 69px;
+  left: 180px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #005eb9;
+  font-family: 'Unbounded', sans-serif;
+  user-select: none;
+  z-index: 2;
+  pointer-events: none;
+}

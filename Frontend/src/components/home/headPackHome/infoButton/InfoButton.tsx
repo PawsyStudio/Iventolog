@@ -1,9 +1,13 @@
 import styles from './infoScroll.module.css';
 
-export default function InfoScroll() {
+interface InfoScrollProps {
+  onClick: () => void;
+}
 
-    return(
-        <button className={styles.InfoScroll}>information</button>
-    )
-
+export default function InfoScroll({ onClick }: InfoScrollProps) {
+  return (
+    <button className={styles.InfoScroll} onClick={onClick}>
+      information
+    </button>
+  );
 }

@@ -1,7 +1,22 @@
 .aboutBlock {
   position: relative;
   width: 100%;
-  padding-bottom: 50px;
+  height: 639px;
+  background-color: #071624;
+  overflow: hidden;
+}
+
+/* Добавляем треугольный фон */
+.aboutBlock::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background-color: #2f3c47;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  z-index: 0;
 }
 
 .aboutTitle {
@@ -12,6 +27,8 @@
   text-align: center;
   margin: 36px 0 22px;
   filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
+  position: relative;
+  z-index: 2; /* Поднимаем над фоном */
 }
 
 .contentWrapper {
@@ -19,6 +36,7 @@
   margin: 0 auto;
   width: calc(100% - 54px);
   max-width: 1200px;
+  z-index: 1; /* Поднимаем над фоном */
 }
 
 .frameImage {
@@ -76,29 +94,24 @@
   width: 392px; /* Фиксированный размер по ТЗ */
   height: 392px;
   top: 50px;    /* Отступ от верхнего края рамки */
-  left: 45px;  /* Отступ от левого края рамки */
+  left: 45px;   /* Отступ от левого края рамки */
   object-fit: contain;
-  
+
   /* Гарантируем, что не выйдет за рамку */
   max-width: calc(100% - 158px - 20px); /* 158px слева + 20px справа */
   max-height: calc(100% - 73px - 20px); /* 73px сверху + 20px снизу */
 }
 
-/* Адаптация для мобильных */
-@media (max-width: 768px) {
-  .textContent {
-    width: 60%;
-    right: 30px;
-    top: 80px;
-  }
-  
-  .mainText {
-    font-size: 24px;
-  }
-  
-  .eyeImage {
-    width: 40%;
-    left: 20px;
-    top: 50px;
-  }
+/* ✨ Декоративный текст ABOUT US */
+.decorativeAboutUs {
+  position: absolute;
+  top: 69px;
+  left: 180px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #aeaeae;
+  font-family: 'Unbounded', sans-serif;
+  user-select: none;
+  z-index: 2;
+  pointer-events: none;
 }

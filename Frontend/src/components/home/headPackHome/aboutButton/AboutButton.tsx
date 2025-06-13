@@ -1,9 +1,13 @@
 import styles from './aboutButton.module.css';
 
-export default function aboutScroll() {
+interface AboutScrollProps {
+  onClick: () => void;
+}
 
-    return(
-        <button className={styles.AboutButton}>about Us</button>
-    )
-
+export default function AboutScroll({ onClick }: AboutScrollProps) {
+  return (
+    <button className={styles.AboutButton} onClick={onClick}>
+      about Us
+    </button>
+  );
 }

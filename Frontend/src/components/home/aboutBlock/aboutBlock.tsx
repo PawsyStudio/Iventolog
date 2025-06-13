@@ -6,7 +6,10 @@ export default function AboutBlock() {
   return (
     <div className={styles.aboutBlock}>
       <h1 className={styles.aboutTitle}>о нас</h1>
-      
+
+      {/* Декоративный текст ABOUT US */}
+      <span className={styles.decorativeAboutUs}>ABOUT US</span>
+
       <div className={styles.contentWrapper}>
         {/* Рамка (фон) */}
         <img 
@@ -14,14 +17,14 @@ export default function AboutBlock() {
           alt="Рамка" 
           className={styles.frameImage} 
         />
-        
+
         {/* Изображение глаза */}
         <img 
           src={eyeImage} 
           alt="Глаз" 
           className={styles.eyeImage} 
         />
-        
+
         {/* Текстовый блок */}
         <div className={styles.textContent}>
           <p className={styles.mainText}>
@@ -32,7 +35,7 @@ export default function AboutBlock() {
             только начинает, но мечтает стать крутым веб-<br />
             разработчиком.
           </p>
-          
+
           <div className={styles.nameBlock}>
             <p className={styles.name}>Терентьев Александр</p>
             <p className={styles.position}>Дизайнер</p>

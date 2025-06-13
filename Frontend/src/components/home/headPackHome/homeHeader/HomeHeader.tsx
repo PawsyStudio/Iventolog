@@ -4,15 +4,20 @@ import AboutScroll from '../aboutButton/AboutButton.tsx';
 import CreateButton from '../createButton/CreateButton.tsx';
 import styles from './homeheader.module.css';
 
-export default function Header() {
-    return(
-        <header className={styles.header}>
-            <img src={HomeLogo} alt="logo" className={styles.logo} />
-            <div className={styles.buttonGroup}>
-                <InfoScroll />
-                <AboutScroll />
-            </div>   
-            <CreateButton variant="default" />
-        </header>
-    )
+interface HeaderProps {
+  onScrollToInfo: () => void;
+  onScrollToAbout: () => void;
+}
+
+export default function Header({ onScrollToInfo, onScrollToAbout }: HeaderProps) {
+  return (
+    <header className={styles.header}>
+      <img src={HomeLogo} alt="logo" className={styles.logo} />
+      <div className={styles.buttonGroup}>
+        <InfoScroll onClick={onScrollToInfo} />
+        <AboutScroll onClick={onScrollToAbout} />
+      </div>
+      <CreateButton variant="default" />
+    </header>
+  );
 }

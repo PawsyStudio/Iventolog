@@ -1,7 +1,7 @@
 import { useNavigate } from '@tanstack/react-router';
 import { useAuthStore } from '@/store/AuthStore';
 import { useAuthRedirect } from '@/hooks/useAuthRedirect';
-
+import InfoBlock from '@/components/home/infoBlock/infoBlock';
 import Header from '@/components/home/headPackHome/homeHeader/HomeHeader';
 import Footer from '@/components/footer/Footer';
 import LogoutButton from '@/components/logoutButton/LogoutButton';
@@ -11,23 +11,35 @@ import { AuthModal } from '@/components/authModal/AuthModal';
 
 export function Home() {
   const navigate = useNavigate();
-  const {
-    authModal,
-    hideAuthModal,
-  } = useAuthStore();
+  const { authModal, hideAuthModal } = useAuthStore();
 
-  // Вызов кастомного хука для обработки редиректа авторизации
   useAuthRedirect();
+
+  const scrollToInfo = () => {
+    const el = document.getElementById('infoBlock');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const scrollToAbout = () => {
+    const el = document.getElementById('aboutBlock');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <>
-      <Header />
+      <Header onScrollToInfo={scrollToInfo} onScrollToAbout={scrollToAbout} />
       <main>
         <DecorBlock />
-        <LogoutButton />
-        <AboutBlock />
 
-        {/* Модальное окно авторизации */}
+        <section id="infoBlock" style={{ scrollMarginTop: '80px' }}>
+          <InfoBlock />
+        </section>
+
+        <section id="aboutBlock" style={{ scrollMarginTop: '80px' }}>
+          <AboutBlock />
+        </section>
+
+        <LogoutButton />
         <AuthModal
           initialTab={authModal.tab}
           isOpen={authModal.isOpen}
