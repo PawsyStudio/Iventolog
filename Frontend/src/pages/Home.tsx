@@ -38,8 +38,6 @@ export function Home() {
         <section id="aboutBlock" style={{ scrollMarginTop: '80px' }}>
           <AboutBlock />
         </section>
-
-        <LogoutButton />
         <AuthModal
           initialTab={authModal.tab}
           isOpen={authModal.isOpen}
@@ -54,6 +52,7 @@ export function Home() {
         />
       </main>
       <Footer />
+      <LogoutButton />
     </>
   );
 }
