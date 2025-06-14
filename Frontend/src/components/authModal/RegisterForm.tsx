@@ -101,7 +101,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
       {error && <div className={styles.error}>{error}</div>}
 
       <button type="submit" className={styles.submitButton}>
-        Register
+        Зарегистрироваться
       </button>
     </form>
   );

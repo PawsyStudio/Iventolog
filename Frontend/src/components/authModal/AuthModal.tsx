@@ -1,3 +1,4 @@
+// AuthModal.tsx
 import { useState } from 'react';
 import { LoginForm } from './LoginForm';
 import { RegisterForm } from './RegisterForm';
@@ -20,13 +21,11 @@ export function AuthModal({
 
   if (!isOpen) return null;
 
-  // Определяем размеры для разных состояний
   const modalStyle = {
     height: activeTab === 'login' ? '559px' : '683px',
     width: '792px'
   };
 
-  // Определяем стили для кнопки переключения
   const switchButtonStyle = {
     width: activeTab === 'login' ? '170px' : '148px',
     height: '51px',
@@ -43,7 +42,7 @@ export function AuthModal({
       >
         <div className={styles.modalHeader}>
           <h2 className={styles.modalTitle}>
-            {activeTab === 'login' ? 'Log in' : 'Register'}
+            {activeTab === 'login' ? 'Вход' : 'Регистрация'}
           </h2>
           
           <div className={styles.headerActions}>
@@ -52,13 +51,13 @@ export function AuthModal({
               onClick={() => setActiveTab(activeTab === 'login' ? 'register' : 'login')}
               style={switchButtonStyle}
             >
-              {activeTab === 'login' ? 'Register' : 'Log in'}
+              {activeTab === 'login' ? 'Регистрация' : 'Вход'}
             </button>
             
             <button 
               className={styles.closeButton}
               onClick={onClose}
-              aria-label="Close"
+              aria-label="Закрыть"
             >
               &times;
             </button>

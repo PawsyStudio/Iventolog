@@ -56,7 +56,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
       {error && <div className={styles.error}>{error}</div>}
 
       <button type="submit" className={styles.submitButton}>
-        Log in
+        Войти
       </button>
     </form>
   );
