@@ -1,17 +1,53 @@
-.event-list {
+.eventList {
   display: grid;
-  gap: 1rem;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 }
 
-.event-card {
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+.eventCard {
+  position: relative;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: inherit;
 }
 
-.event-card:hover {
-  background-color: #f5f5f5;
-  transform: translateY(-2px);
+.eventSvg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.eventContent {
+  position: relative;
+  z-index: 2;
+  padding: 1.5rem;
+  max-width: 80%;
+}
+
+.eventCard h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #2c3e50;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+}
+
+.eventCard p {
+  margin: 0.5rem 0 0;
+  font-size: 0.95rem;
+  color: #34495e;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+}
+
+.eventCard:hover {
+  transform: translateY(-5px);
+  filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1));
 }

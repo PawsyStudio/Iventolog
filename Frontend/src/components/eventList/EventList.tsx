@@ -1,5 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import type { Event } from '@/types/event';
+import meroBorder from '../../assets/images/decoration/meroBorder.svg'; // Импортируем PNG
+import styles from './EventList.module.css';
 
 interface EventListProps {
   events: Event[];
@@ -11,18 +13,26 @@ export function EventList({ events, isLoading }: EventListProps) {
   if (events.length === 0) return <div>У вас пока нет мероприятий</div>;
 
   return (
-    <div className="event-list">
+    <div className={styles.eventList}>
       {events.map(event => (
         <Link 
           to="/event/$eventId"
           params={{ eventId: event.id }}
           key={event.id}
-          className="event-card"
+          className={styles.eventCard}
         >
-          <h3>{event.title}</h3>
-          {event.event_date && (
-            <p>Дата: {new Date(event.event_date).toLocaleDateString()}</p>
-          )}
+          {/* Используем тег img для PNG */}
+          <img 
+            src={meroBorder} 
+            alt="Event background" 
+            className={styles.eventSvg}
+          />
+          <div className={styles.eventContent}>
+            <h3>{event.title}</h3>
+            {event.event_date && (
+              <p>Дата: {new Date(event.event_date).toLocaleDateString()}</p>
+            )}
+          </div>
         </Link>
       ))}
     </div>
