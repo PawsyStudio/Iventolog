@@ -1,0 +1,141 @@
+/* Sidebar.module.css */
+.sidebar {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.topBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 94px;
+  background-color: #07192b;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 21px;
+  box-sizing: border-box;
+}
+
+.logo {
+  margin-top: 2px;
+}
+
+.logoutWrapper {
+  margin-top: 6px;
+  margin-right: -8px;
+}
+
+.navigation {
+  position: absolute;
+  top: 94px;
+  left: 0;
+  width: 100%;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.navList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.navItem {
+  margin-bottom: 1.5rem;
+}
+
+/* Общие стили для всех элементов навигации */
+.navButton,
+.navLink {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: bold;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  box-sizing: border-box;
+  position: relative;
+  padding: 0; /* Убираем все паддинги - будем контролировать вручную */
+}
+
+/* Контейнеры для точного позиционирования */
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px; /* Фиксированная ширина для выравнивания */
+  margin-right: 4px; /* Минимальный отступ */
+}
+
+.text {
+  padding: 11px 0; /* Вертикальные отступы */
+}
+
+/* Ручная настройка паддингов для каждого элемента */
+.navButton {
+  color: #1e90ff;
+  padding-left: 16px; /* Фиксированный отступ слева */
+}
+
+.navLink {
+  color: #1e90ff;
+  padding-left: 16px; /* Фиксированный отступ слева */
+}
+
+.homeLink {
+  color: #ffffff !important;
+}
+
+/* Иконки */
+.navIcon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  display: block; /* Убираем лишнее пространство */
+}
+
+/* Специальный стиль для "Мои мероприятия" */
+.navItem.eventsItem .navLink {
+  background-color: #0a3763;
+  margin-left: 4px;
+  border-radius: 31.5px;
+  padding: 0; /* Убираем паддинги - будем контролировать вручную */
+}
+
+.navItem.eventsItem .iconWrapper {
+  width: 44px;
+  margin-left: 12px; /* Сдвигаем иконку вправо */
+}
+
+.navItem.eventsItem .text {
+  padding: 11px 20px 11px 0; /* Ручная настройка отступов */
+}
+
+/* Стили при наведении */
+.navButton:hover {
+  color: #63b3ff;
+}
+
+.homeLink:hover {
+  color: #cccccc !important;
+}
+
+.navLink:hover {
+  color: #63b3ff;
+}
+
+/* Упрощенный фокус - только изменение цвета */
+.navButton:focus,
+.navLink:focus {
+  outline: none;
+  color: #63b3ff !important;
+}

@@ -1,3 +1,4 @@
+// CreateEventForm.tsx
 import { useState } from 'react';
 import styles from './CreateEventForm.module.css';
 
@@ -82,6 +83,7 @@ export function CreateEventForm({ onSuccess, onError, onCancel }: CreateEventFor
           onChange={(e) => handleChange('title', e.target.value)}
           required
           maxLength={100}
+          placeholder="Введите название"
         />
       </div>
 
@@ -109,6 +111,7 @@ export function CreateEventForm({ onSuccess, onError, onCancel }: CreateEventFor
             value={formData.venue_cost || ''}
             onChange={(e) => handleChange('venue_cost', e.target.value)}
             required
+            placeholder="Укажите стоимость"
           />
         </div>
       )}
