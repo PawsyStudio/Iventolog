@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
 import styles from './PollAndGuestsTab.module.css';
+import Bg1 from '@/assets/images/decoration/1.svg';
+import Bg2 from '@/assets/images/decoration/2.svg';
+import Bg3 from '@/assets/images/decoration/3.svg';
+import Bg4 from '@/assets/images/decoration/4.svg';
 
 interface Guest {
   id: string;
@@ -22,7 +26,6 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Конвертация UTC в локальное время для input
   const convertUTCToLocal = (utcDate: string) => {
     if (!utcDate) return '';
     const date = new Date(utcDate);
@@ -34,14 +37,12 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   };
 
-  // Конвертация локального времени в UTC для сервера
   const convertLocalToUTC = (localDate: string) => {
     if (!localDate) return '';
     const date = new Date(localDate);
     return date.toISOString();
   };
 
-  // Загрузка настроек опроса
   const fetchPollSettings = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -76,7 +77,6 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
     }
   };
 
-  // Загрузка списка гостей
   const fetchGuests = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -103,13 +103,11 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
     }
   };
 
-  // Первоначальная загрузка данных
   useEffect(() => {
     fetchPollSettings();
     fetchGuests();
   }, [eventId]);
 
-  // Сохранение настроек
   const handleSave = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -120,18 +118,15 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
 
       setIsLoading(true);
       
-      // Проверяем, было ли изменение времени
       const originalLocal = convertUTCToLocal(pollSettings.poll_deadline);
       const hasChanged = originalLocal !== tempSettings.poll_deadline;
       
-      // Если время не изменилось, просто выходим из режима редактирования
       if (!hasChanged) {
         setIsEditing(false);
         setIsLoading(false);
         return;
       }
 
-      // Конвертируем локальное время в UTC перед отправкой
       const utcDeadline = convertLocalToUTC(tempSettings.poll_deadline);
       
       const response = await fetch(`http://localhost:8000/api/events/${eventId}/poll/`, {
@@ -161,23 +156,19 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
     }
   };
 
-  // Отмена редактирования
   const handleCancel = () => {
     setTempSettings({...pollSettings});
     setIsEditing(false);
   };
 
-  // Активация режима редактирования с конвертацией времени
   const handleEdit = () => {
     setIsEditing(true);
-    // Конвертируем UTC в локальное время для редактирования
     setTempSettings({
       ...pollSettings,
       poll_deadline: convertUTCToLocal(pollSettings.poll_deadline)
     });
   };
 
-  // Удаление гостя
   const handleDeleteGuest = async (guestId: string) => {
     if (!confirm('Вы уверены, что хотите удалить гостя?')) return;
     
@@ -211,122 +202,172 @@ export function PollAndGuestsTab({ eventId }: { eventId: string }) {
   }
 
   return (
-    <div className={styles.container}>
-      {error && (
-        <div className={styles.error}>
-          {error}
-          <button onClick={() => setError(null)}>×</button>
-        </div>
-      )}
-
-      <div className={styles.pollBlock}>
-        <h2>Опрос</h2>
-        
-        <div className={styles.settingRow}>
-          <label>Зарегистрировано гостей:</label>
-          <span>{guests.length}</span>
-        </div>
-        
-        <div className={styles.settingRow}>
-          <label>Дата окончания опроса:</label>
-          {isEditing ? (
-            <input
-              type="datetime-local"
-              value={tempSettings.poll_deadline}
-              onChange={(e) => setTempSettings({...tempSettings, poll_deadline: e.target.value})}
-            />
-          ) : (
-            <span>{pollSettings.poll_deadline ? new Date(pollSettings.poll_deadline).toLocaleString() : 'Не установлена'}</span>
-          )}
-        </div>
-        
-        <div className={styles.settingRow}>
-          <label>Ссылка для регистрации:</label>
-          <div className={styles.linkContainer}>
-            <input
-              type="text"
-              value={registrationLink}
-              readOnly
-              className={styles.linkInput}
-              onClick={(e) => (e.target as HTMLInputElement).select()}
-            />
-            <button 
-              className={styles.copyButton}
-              onClick={() => {
-                navigator.clipboard.writeText(registrationLink);
-                alert('Ссылка скопирована в буфер обмена');
-              }}
-            >
-              Копировать
-            </button>
-          </div>
-        </div>
-        
-        <div className={styles.controls}>
-          {!isEditing ? (
-            <button 
-              className={styles.editButton}
-              onClick={handleEdit}
-              disabled={isLoading}
-            >
-              Редактировать
-            </button>
-          ) : (
-            <>
-              <button 
-                className={styles.saveButton}
-                onClick={handleSave}
-                disabled={isLoading}
-              >
-                {isLoading ? 'Сохранение...' : 'Сохранить'}
-              </button>
-              <button 
-                className={styles.cancelButton}
-                onClick={handleCancel}
-                disabled={isLoading}
-              >
-                Отменить
-              </button>
-            </>
-          )}
-        </div>
+    <div style={{ 
+      position: 'relative', 
+      width: '100%',
+      minHeight: '100%',
+      overflow: 'hidden'
+    }}>
+      <div style={{
+        position: 'fixed',
+        top: '0px',
+        right: '0px',
+        zIndex: 0,
+        pointerEvents: 'none'
+      }}>
+        <img src={Bg1} alt="" style={{ width: '100%', height: 'auto' }} />
+      </div>
+      
+      <div style={{
+        position: 'fixed',
+        bottom: '-90px',
+        right: '0px',
+        zIndex: 0,
+        pointerEvents: 'none'
+      }}>
+        <img src={Bg2} alt="" style={{ width: '100%', height: 'auto' }} />
+      </div>
+      
+      <div style={{
+        position: 'fixed',
+        top: '318px',
+        right: '0px',
+        zIndex: 0,
+        pointerEvents: 'none'
+      }}>
+        <img src={Bg3} alt="" style={{ width: '100%', height: 'auto' }} />
+      </div>
+      
+      <div style={{
+        position: 'fixed',
+        bottom: '0px',
+        right: '513px',
+        zIndex: 0,
+        pointerEvents: 'none'
+      }}>
+        <img src={Bg4} alt="" style={{ width: '100%', height: 'auto' }} />
       </div>
 
-      <div className={styles.guestsBlock}>
-        <h2>Список гостей ({guests.length})</h2>
-        
-        {guests.length > 0 ? (
-          <div className={styles.tableContainer}>
-            <table className={styles.guestsTable}>
-              <thead>
-                <tr>
-                  <th>Telegram ID</th>
-                  <th>ФИО</th>
-                  <th>Действия</th>
-                </tr>
-              </thead>
-              <tbody>
-                {guests.map(guest => (
-                  <tr key={guest.id}>
-                    <td>{guest.telegram_id ? `@${guest.telegram_id}` : '-'}</td>
-                    <td>{guest.full_name}</td>
-                    <td>
-                      <button 
-                        className={styles.deleteButton}
-                        onClick={() => handleDeleteGuest(guest.id)}
-                        disabled={isLoading}
-                      >
-                        Удалить
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      <div className={styles.container}>
+        {error && (
+          <div className={styles.error}>
+            {error}
+            <button onClick={() => setError(null)}>×</button>
           </div>
-        ) : (
-          <p>Пока никто не зарегистрировался</p>
         )}
+
+        <div className={styles.columnsContainer}>
+          <div className={styles.pollBlock}>
+            <h2>Опрос</h2>
+            
+            <div className={styles.settingRow}>
+              <label>Зарегистрировано гостей:</label>
+              <span>{guests.length}</span>
+            </div>
+            
+            <div className={styles.settingRow}>
+              <label>Дата окончания опроса:</label>
+              {isEditing ? (
+                <input
+                  type="datetime-local"
+                  value={tempSettings.poll_deadline}
+                  onChange={(e) => setTempSettings({...tempSettings, poll_deadline: e.target.value})}
+                  className={styles.dateInput}
+                />
+              ) : (
+                <span>{pollSettings.poll_deadline ? new Date(pollSettings.poll_deadline).toLocaleString() : 'Не установлена'}</span>
+              )}
+            </div>
+            
+            <div className={styles.settingRow}>
+              <label>Ссылка для регистрации:</label>
+              <div className={styles.linkContainer}>
+                <input
+                  type="text"
+                  value={registrationLink}
+                  readOnly
+                  className={styles.linkInput}
+                  onClick={(e) => (e.target as HTMLInputElement).select()}
+                />
+                <button 
+                  className={styles.copyButton}
+                  onClick={() => {
+                    navigator.clipboard.writeText(registrationLink);
+                    alert('Ссылка скопирована в буфер обмена');
+                  }}
+                >
+                  Копировать
+                </button>
+              </div>
+            </div>
+            
+            <div className={styles.controls}>
+              {!isEditing ? (
+                <button 
+                  className={styles.editButton}
+                  onClick={handleEdit}
+                  disabled={isLoading}
+                >
+                  Редактировать
+                </button>
+              ) : (
+                <>
+                  <button 
+                    className={styles.saveButton}
+                    onClick={handleSave}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Сохранение...' : 'Сохранить'}
+                  </button>
+                  <button 
+                    className={styles.cancelButton}
+                    onClick={handleCancel}
+                    disabled={isLoading}
+                  >
+                    Отменить
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className={styles.guestsBlock}>
+            <h2>Список гостей ({guests.length})</h2>
+            
+            {guests.length > 0 ? (
+              <div className={styles.tableContainer}>
+                <table className={styles.guestsTable}>
+                  <thead>
+                    <tr>
+                      <th>Telegram ID</th>
+                      <th>ФИО</th>
+                      <th>Действия</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {guests.map(guest => (
+                      <tr key={guest.id}>
+                        <td>{guest.telegram_id ? `@${guest.telegram_id}` : '-'}</td>
+                        <td>{guest.full_name}</td>
+                        <td>
+                          <button 
+                            className={styles.deleteButton}
+                            onClick={() => handleDeleteGuest(guest.id)}
+                            disabled={isLoading}
+                          >
+                            Удалить
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className={styles.emptyMessage}>Пока никто не зарегистрировался</p>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -302,7 +302,15 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
                 />
               ) : (
                 <span className={styles.paramValue}>
-                  {currentEvent.event_date ? new Date(currentEvent.event_date).toLocaleString() : 'Не указана'}
+                  {currentEvent.event_date ? 
+                    new Date(currentEvent.event_date).toLocaleString('ru-RU', {
+                      year: 'numeric',
+                      month: 'numeric',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    }) 
+                    : 'Не указана'}
                 </span>
               )}
             </li>
