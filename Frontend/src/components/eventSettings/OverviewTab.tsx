@@ -2,6 +2,12 @@ import { useState, useEffect } from 'react';
 import type { Event } from '@/types/event';
 import styles from './OverviewTab.module.css';
 
+import Bg1 from '@/assets/images/decoration/1.svg';
+import Bg2 from '@/assets/images/decoration/2.svg';
+import Bg3 from '@/assets/images/decoration/3.svg';
+import Bg4 from '@/assets/images/decoration/4.svg';
+import BackOver from '@/assets/images/decoration/backOver.svg';
+
 interface BudgetData {
   total_per_person: number;
   total_overall: number;
@@ -16,7 +22,6 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
   const [isEditingParams, setIsEditingParams] = useState(false);
   const [budgetData, setBudgetData] = useState<BudgetData | null>(null);
   
-  // Форма для редактирования параметров
   const [formParams, setFormParams] = useState({
     title: initialEvent.title,
     venue_type: initialEvent.venue_type,
@@ -25,10 +30,8 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
       new Date(initialEvent.event_date).toISOString().slice(0, 16) : ''
   });
 
-  // Динамическое количество гостей
   const guestsCount = currentEvent.guests_count || 0;
 
-  // Загрузка данных бюджета
   const fetchBudget = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -47,7 +50,6 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
     }
   };
 
-  // Обновление состояний при изменении initialEvent
   useEffect(() => {
     setCurrentEvent(initialEvent);
     setFormParams({
@@ -60,7 +62,6 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
     fetchBudget();
   }, [initialEvent]);
 
-  // Обновление основных параметров
   const updateEventParams = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -113,7 +114,6 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
     }
   };
 
-  // Обработчик изменений в форме параметров
   const handleParamChange = (field: string, value: string | number) => {
     setFormParams(prev => ({
       ...prev,
@@ -121,7 +121,6 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
     }));
   };
 
-  // Отмена редактирования параметров
   const cancelParamsEdit = () => {
     setFormParams({
       title: currentEvent.title,
@@ -134,114 +133,198 @@ export function OverviewTab({ event: initialEvent }: { event: Event }) {
   };
 
   return (
-    <div className={styles.overview}>
-      <div className={styles.summary}>
-        <h2>Сводка по мероприятию:</h2>
-        <ul className={styles.list}>
-          <li>Количество гостей: {guestsCount}</li>
-          <li>Сумма с человека: {budgetData ? `${budgetData.total_per_person.toFixed(2)} RUB` : 'Загрузка...'}</li>
-          <li>Итоговая сумма: {budgetData ? `${budgetData.total_overall.toFixed(2)} RUB` : 'Загрузка...'}</li>
-        </ul>
+    <div style={{ 
+      position: 'relative', 
+      width: '100%',
+      minHeight: '100%',
+      overflow: 'hidden'
+    }}>
+      <div style={{
+        position: 'fixed',
+        top: '0px',
+        right: '0px',
+        zIndex: 0,
+        pointerEvents: 'none'
+      }}>
+        <img src={Bg1} alt="" style={{ width: '100%', height: 'auto' }} />
+      </div>
+      
+      <div style={{
+        position: 'fixed',
+        bottom: '-90px',
+        right: '0px',
+        zIndex: 0,
+        pointerEvents: 'none'
+      }}>
+        <img src={Bg2} alt="" style={{ width: '100%', height: 'auto' }} />
+      </div>
+      
+      <div style={{
+        position: 'fixed',
+        top: '318px',
+        right: '0px',
+        zIndex: 0,
+        pointerEvents: 'none'
+      }}>
+        <img src={Bg3} alt="" style={{ width: '100%', height: 'auto' }} />
+      </div>
+      
+      <div style={{
+        position: 'fixed',
+        bottom: '0px',
+        right: '513px',
+        zIndex: 0,
+        pointerEvents: 'none'
+      }}>
+        <img src={Bg4} alt="" style={{ width: '100%', height: 'auto' }} />
+      </div>
+      
+      <div style={{
+        position: 'fixed',
+        top: '94px',
+        right: '15px',
+        zIndex: 0.5,
+        pointerEvents: 'none',
+      }}>
+        <img src={BackOver} alt="" style={{ width: '100%', height: 'auto' }} />
       </div>
 
-      <div className={styles.params}>
-        <div className={styles.paramsHeader}>
-          <h2>Основные параметры:</h2>
-          {!isEditingParams && (
-            <button 
-              className={styles.editButton}
-              onClick={() => setIsEditingParams(true)}
-            >
-              Редактировать
-            </button>
+      <div className={styles.overview} style={{ position: 'relative', zIndex: 1 }}>
+        <div className={styles.summary}>
+          <h2>Сводка по мероприятию:</h2>
+          <ul className={styles.list}>
+            <li>
+              <div className={styles.summaryContainer}>
+                <span className={styles.summaryLabel}>Количество гостей:</span>
+                <span className={styles.summaryValue}>{guestsCount}</span>
+              </div>
+              <div className={styles.line}></div>
+            </li>
+            <li>
+              <div className={styles.summaryContainer}>
+                <span className={styles.summaryLabel}>Сумма с человека:</span>
+                <span className={styles.summaryValue}>
+                  {budgetData ? `${budgetData.total_per_person.toFixed(2)} RUB` : 'Загрузка...'}
+                </span>
+              </div>
+              <div className={styles.line}></div>
+            </li>
+            <li>
+              <div className={styles.summaryContainer}>
+                <span className={styles.summaryLabel}>Итоговая сумма:</span>
+                <span className={styles.summaryValue}>
+                  {budgetData ? `${budgetData.total_overall.toFixed(2)} RUB` : 'Загрузка...'}
+                </span>
+              </div>
+              <div className={styles.line}></div>
+            </li>
+          </ul>
+        </div>
+
+        <div className={styles.params}>
+          <div className={styles.paramsHeader}>
+            <h2>Основные параметры:</h2>
+            {!isEditingParams && (
+              <button 
+                className={styles.editButton}
+                onClick={() => setIsEditingParams(true)}
+              >
+                Редактировать
+              </button>
+            )}
+          </div>
+          
+          <ul className={styles.list}>
+            <li>
+              <span className={styles.paramLabel}>Название мероприятия:</span>
+              {isEditingParams ? (
+                <input
+                  type="text"
+                  className={styles.paramInput}
+                  value={formParams.title}
+                  onChange={(e) => handleParamChange('title', e.target.value)}
+                  maxLength={100}
+                />
+              ) : (
+                <span className={styles.paramValue}>{currentEvent.title}</span>
+              )}
+            </li>
+            
+            <li>
+              <span className={styles.paramLabel}>Тип места проведения:</span>
+              {isEditingParams ? (
+                <select
+                  className={styles.paramInput}
+                  value={formParams.venue_type}
+                  onChange={(e) => handleParamChange('venue_type', e.target.value)}
+                >
+                  <option value="OWN">Своё</option>
+                  <option value="RENTED">Съёмное</option>
+                </select>
+              ) : (
+                <span className={styles.paramValue}>
+                  {currentEvent.venue_type === 'OWN' ? 'Своё' : 'Съёмное'}
+                </span>
+              )}
+            </li>
+            
+            {currentEvent.venue_type === 'RENTED' && !isEditingParams && (
+              <li>
+                <span className={styles.paramLabel}>Цена за аренду:</span>
+                <span className={styles.paramValue}>
+                  {Number(currentEvent.venue_cost).toLocaleString('ru-RU')} RUB
+                </span>
+              </li>
+            )}
+            
+            {formParams.venue_type === 'RENTED' && isEditingParams && (
+              <li>
+                <span className={styles.paramLabel}>Цена за аренду:</span>
+                <input
+                  type="number"
+                  className={styles.paramInput}
+                  min="0"
+                  step="100"
+                  value={formParams.venue_cost}
+                  onChange={(e) => handleParamChange('venue_cost', e.target.value)}
+                />
+              </li>
+            )}
+            
+            <li>
+              <span className={styles.paramLabel}>Дата проведения:</span>
+              {isEditingParams ? (
+                <input
+                  type="datetime-local"
+                  className={styles.paramInput}
+                  value={formParams.event_date}
+                  onChange={(e) => handleParamChange('event_date', e.target.value)}
+                />
+              ) : (
+                <span className={styles.paramValue}>
+                  {currentEvent.event_date ? new Date(currentEvent.event_date).toLocaleString() : 'Не указана'}
+                </span>
+              )}
+            </li>
+          </ul>
+
+          {isEditingParams && (
+            <div className={styles.paramControls}>
+              <button 
+                className={styles.submitButton}
+                onClick={updateEventParams}
+              >
+                Подтвердить
+              </button>
+              <button 
+                className={styles.cancelButton}
+                onClick={cancelParamsEdit}
+              >
+                Отмена
+              </button>
+            </div>
           )}
         </div>
-        
-        <ul className={styles.list}>
-          <li>
-            Название мероприятия: 
-            {isEditingParams ? (
-              <input
-                type="text"
-                className={styles.input}
-                value={formParams.title}
-                onChange={(e) => handleParamChange('title', e.target.value)}
-                maxLength={100}
-              />
-            ) : (
-              currentEvent.title
-            )}
-          </li>
-          
-          <li>
-            Тип места проведения: 
-            {isEditingParams ? (
-              <select
-                className={styles.select}
-                value={formParams.venue_type}
-                onChange={(e) => handleParamChange('venue_type', e.target.value)}
-              >
-                <option value="OWN">Своё</option>
-                <option value="RENTED">Съёмное</option>
-              </select>
-            ) : (
-              currentEvent.venue_type === 'OWN' ? 'Своё' : 'Съёмное'
-            )}
-          </li>
-          
-          {/* Блок для отображения цены аренды в режиме просмотра */}
-          {currentEvent.venue_type === 'RENTED' && !isEditingParams && (
-            <li>
-              Цена за аренду: {Number(currentEvent.venue_cost).toLocaleString('ru-RU')} RUB
-            </li>
-          )}
-          
-          {/* Блок для редактирования цены аренды */}
-          {formParams.venue_type === 'RENTED' && isEditingParams && (
-            <li>
-              Цена за аренду: 
-              <input
-                type="number"
-                className={styles.input}
-                min="0"
-                step="100"
-                value={formParams.venue_cost}
-                onChange={(e) => handleParamChange('venue_cost', e.target.value)}
-              />
-            </li>
-          )}
-          
-          <li>
-            Дата проведения: 
-            {isEditingParams ? (
-              <input
-                type="datetime-local"
-                className={styles.input}
-                value={formParams.event_date}
-                onChange={(e) => handleParamChange('event_date', e.target.value)}
-              />
-            ) : (
-              currentEvent.event_date ? new Date(currentEvent.event_date).toLocaleString() : 'Не указана'
-            )}
-          </li>
-        </ul>
-
-        {isEditingParams && (
-          <div className={styles.paramControls}>
-            <button 
-              className={styles.cancelButton}
-              onClick={cancelParamsEdit}
-            >
-              Отмена
-            </button>
-            <button 
-              className={styles.submitButton}
-              onClick={updateEventParams}
-            >
-              Подтвердить
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

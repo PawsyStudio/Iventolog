@@ -1,6 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useParams } from '@tanstack/react-router';
 import styles from './GuestRegistrationPage.module.css';
+import Footer from '@/components/footer/Footer';
+import HomeLogo from '../../assets/images/logos/iventologHeader.svg';
+
+function RegistrationHeader() {
+  return (
+    <header className={styles.header}>
+      <div className={styles.logoContainer}>
+        <img src={HomeLogo} alt="Iventolog Logo" className={styles.logo} />
+      </div>
+      <div className={styles.welcomeContainer}>
+        <span className={styles.welcomeText}>WELCOME</span>
+      </div>
+    </header>
+  );
+}
 
 export default function PublicGuestRegistrationPage() {
   const { eventId } = useParams({ from: '/public/event/$eventId/guest-register' });
@@ -14,7 +29,6 @@ export default function PublicGuestRegistrationPage() {
   const [pollDeadline, setPollDeadline] = useState<string | null>(null);
   const [isPollClosed, setIsPollClosed] = useState(false);
 
-  // Загрузка данных мероприятия
   useEffect(() => {
     let isMounted = true;
 
@@ -45,7 +59,6 @@ export default function PublicGuestRegistrationPage() {
         );
         
         if (response.status === 404) {
-          // Настройки опроса не найдены - считаем регистрацию открытой
           return;
         }
         
@@ -78,7 +91,6 @@ export default function PublicGuestRegistrationPage() {
     };
   }, [eventId]);
 
-  // Проверка актуальности дедлайна
   useEffect(() => {
     if (!pollDeadline) return;
     
@@ -90,7 +102,6 @@ export default function PublicGuestRegistrationPage() {
     }
   }, [pollDeadline]);
 
-  // Проверка существующей регистрации
   const checkExistingRegistration = async (tgId: string) => {
     try {
       const response = await fetch(
@@ -112,23 +123,19 @@ export default function PublicGuestRegistrationPage() {
     
     if (isLoading || isPollClosed) return;
     
-    // Очистка и нормализация данных
     const cleanTelegramId = telegramId.trim().replace('@', '');
     const cleanFullName = fullName.trim();
     
-    // Валидация
     if (!cleanTelegramId || !cleanFullName) {
       setError('Заполните все обязательные поля');
       return;
     }
     
-    // Валидация Telegram ID
     if (!/^[a-zA-Z0-9_]{5,32}$/.test(cleanTelegramId)) {
       setError('Telegram ID должен содержать 5-32 символа (латиница, цифры, подчеркивания)');
       return;
     }
     
-    // Валидация ФИО
     if (!/^[а-яА-ЯёЁa-zA-Z\s\-.]{2,100}$/.test(cleanFullName)) {
       setError('ФИО должно содержать 2-100 символов (буквы, пробелы, дефисы)');
       return;
@@ -138,7 +145,6 @@ export default function PublicGuestRegistrationPage() {
     setError(null);
 
     try {
-      // Проверка существующей регистрации
       const alreadyRegistered = await checkExistingRegistration(cleanTelegramId);
       if (alreadyRegistered) {
         setError('Этот Telegram ID уже зарегистрирован на мероприятие');
@@ -146,7 +152,6 @@ export default function PublicGuestRegistrationPage() {
         return;
       }
 
-      // Отправка данных
       const response = await fetch(`http://localhost:8000/api/events/${eventId}/guests/`, {
         method: 'POST',
         headers: {
@@ -170,7 +175,6 @@ export default function PublicGuestRegistrationPage() {
 
       setSuccess(true);
       
-      // Сброс формы через 5 секунд
       setTimeout(() => {
         setTelegramId('');
         setFullName('');
@@ -183,129 +187,109 @@ export default function PublicGuestRegistrationPage() {
     }
   };
 
-  if (isEventLoading) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.loadingMessage}>Загрузка мероприятия...</div>
-      </div>
-    );
-  }
-
-  if (error && !eventTitle) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.errorMessage}>
-          <h2>Ошибка</h2>
-          <p>{error}</p>
-          <button 
-            className={styles.homeButton}
-            onClick={() => window.location.href = '/'}
-          >
-            На главную
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (isPollClosed) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.closedMessage}>
-          <h2>Регистрация закрыта</h2>
-          <p>К сожалению, срок регистрации на мероприятие истек.</p>
-          <button 
-            className={styles.homeButton}
-            onClick={() => window.location.href = '/'}
-          >
-            На главную
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (success) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.successMessage}>
-          <h2>Регистрация успешна!</h2>
-          <p>Вы зарегистрированы на мероприятие: {eventTitle}</p>
-          <button 
-            className={styles.homeButton}
-            onClick={() => window.location.href = '/'}
-          >
-            Вернуться на главную
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className={styles.container}>
-      <div className={styles.formWrapper}>
-        <h2>Регистрация на мероприятие: {eventTitle}</h2>
-        
-        {error ? (
-          <div className={styles.error}>
-            {error}
-            <button onClick={() => setError(null)} className={styles.retryButton}>
-              Попробовать снова
+    <div className={styles.pageContainer}>
+      <RegistrationHeader />
+      
+      <div className={styles.container}>
+        {isEventLoading ? (
+          <div className={styles.loadingMessage}>Загрузка мероприятия...</div>
+        ) : error && !eventTitle ? (
+          <div className={styles.errorMessage}>
+            <h2>Ошибка</h2>
+            <p>{error}</p>
+            <button 
+              className={styles.homeButton}
+              onClick={() => window.location.href = '/'}
+            >
+              На главную
+            </button>
+          </div>
+        ) : isPollClosed ? (
+          <div className={styles.closedMessage}>
+            <h2>Регистрация закрыта</h2>
+            <p>К сожалению, срок регистрации на мероприятие истек.</p>
+            <button 
+              className={styles.homeButton}
+              onClick={() => window.location.href = '/'}
+            >
+              На главную
+            </button>
+          </div>
+        ) : success ? (
+          <div className={styles.successMessage}>
+            <h2>Регистрация успешна!</h2>
+            <p>Вы зарегистрированы на мероприятие: {eventTitle}</p>
+            <button 
+              className={styles.homeButton}
+              onClick={() => window.location.href = '/'}
+            >
+              Вернуться на главную
             </button>
           </div>
         ) : (
-          <>
-            <p>Пожалуйста, введите ваши данные:</p>
-            <form onSubmit={handleSubmit}>
-              <div className={styles.formGroup}>
-                <label htmlFor="telegramId">Telegram ID *</label>
-                <input
-                  type="text"
-                  id="telegramId"
-                  value={telegramId}
-                  onChange={(e) => {
-                    let value = e.target.value;
-                    // Автодобавление @
-                    if (value.length === 1 && !value.startsWith('@')) {
-                      value = '@' + value;
-                    }
-                    setTelegramId(value);
-                  }}
-                  required
-                  placeholder="@username"
-                  pattern="^@[a-zA-Z0-9_]{5,32}$"
-                  title="Формат: @username (5-32 символов, латиница, цифры, подчеркивание)"
-                />
-                <small>Пример: @my_telegram123</small>
+          <div className={styles.formWrapper}>
+            <h2 className={styles.pollTitle}>Опрос на: 1 мероприятие</h2>
+            
+            {error ? (
+              <div className={styles.error}>
+                {error}
+                <button onClick={() => setError(null)} className={styles.retryButton}>
+                  Попробовать снова
+                </button>
               </div>
-              
-              <div className={styles.formGroup}>
-                <label htmlFor="fullName">ФИО *</label>
-                <input
-                  type="text"
-                  id="fullName"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required
-                  placeholder="Иванов Иван Иванович"
-                  pattern="^[а-яА-ЯёЁa-zA-Z\s\-.]{2,100}$"
-                  title="Только буквы, пробелы и дефисы (2-100 символов)"
-                />
-                <small>Пример: Иванов Иван Иванович</small>
-              </div>
-              
-              <button 
-                type="submit" 
-                className={styles.submitButton}
-                disabled={isLoading}
-              >
-                {isLoading ? 'Регистрация...' : 'Зарегистрироваться'}
-              </button>
-            </form>
-          </>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <div className={styles.formGroup}>
+                  <label htmlFor="telegramId">Telegram ID *</label>
+                  <input
+                    type="text"
+                    id="telegramId"
+                    value={telegramId}
+                    onChange={(e) => {
+                      let value = e.target.value;
+                      if (value.length === 1 && !value.startsWith('@')) {
+                        value = '@' + value;
+                      }
+                      setTelegramId(value);
+                    }}
+                    required
+                    placeholder="@username"
+                    pattern="^@[a-zA-Z0-9_]{5,32}$"
+                    title="Формат: @username (5-32 символов, латиница, цифры, подчеркивание)"
+                  />
+                  <small>Пример: @my_telegram123</small>
+                </div>
+                
+                <div className={styles.formGroup}>
+                  <label htmlFor="fullName">ФИО *</label>
+                  <input
+                    type="text"
+                    id="fullName"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                    placeholder="Иванов Иван Иванович"
+                    pattern="^[а-яА-ЯёЁa-zA-Z\s\-.]{2,100}$"
+                    title="Только буквы, пробелы и дефисы (2-100 символов)"
+                  />
+                  <small>Пример: Иванов Иван Иванович</small>
+                </div>
+                
+                <button 
+                  type="submit" 
+                  className={styles.submitButton}
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Регистрация...' : 'Зарегистрироваться'}
+                </button>
+              </form>
+            )}
+          </div>
         )}
       </div>
+      
+      <Footer />
     </div>
   );
 }
