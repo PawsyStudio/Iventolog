@@ -31,8 +31,6 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className={styles.authForm}>
-      <h2>Вход в аккаунт</h2>
-      
       <div className={styles.formGroup}>
         <label>Email</label>
         <input
@@ -40,7 +38,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          placeholder="Введите ваш email"
+          placeholder="Введите email"
         />
       </div>
 

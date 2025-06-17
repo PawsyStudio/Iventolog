@@ -1,3 +1,4 @@
+// AuthModal.tsx
 import { useState } from 'react';
 import { LoginForm } from './LoginForm';
 import { RegisterForm } from './RegisterForm';
@@ -20,30 +21,47 @@ export function AuthModal({
 
   if (!isOpen) return null;
 
+  const modalStyle = {
+    height: activeTab === 'login' ? '559px' : '683px',
+    width: '792px'
+  };
+
+  const switchButtonStyle = {
+    width: activeTab === 'login' ? '170px' : '148px',
+    height: '51px',
+    backgroundColor: '#1e90ff',
+    color: '#000000',
+    borderRadius: '42px'
+  };
+
   return (
     <div className={styles.authModalOverlay}>
-      <div className={styles.authModal}>
-        <button 
-          className={styles.closeButton}
-          onClick={onClose}
-          aria-label="Закрыть"
-        >
-          &times;
-        </button>
-
-        <div className={styles.tabs}>
-          <button
-            className={`${styles.tabButton} ${activeTab === 'login' ? styles.active : ''}`}
-            onClick={() => setActiveTab('login')}
-          >
-            Войти
-          </button>
-          <button
-            className={`${styles.tabButton} ${activeTab === 'register' ? styles.active : ''}`}
-            onClick={() => setActiveTab('register')}
-          >
-            Регистрация
-          </button>
+      <div 
+        className={styles.authModal} 
+        style={modalStyle}
+      >
+        <div className={styles.modalHeader}>
+          <h2 className={styles.modalTitle}>
+            {activeTab === 'login' ? 'Вход' : 'Регистрация'}
+          </h2>
+          
+          <div className={styles.headerActions}>
+            <button
+              className={styles.switchButton}
+              onClick={() => setActiveTab(activeTab === 'login' ? 'register' : 'login')}
+              style={switchButtonStyle}
+            >
+              {activeTab === 'login' ? 'Регистрация' : 'Вход'}
+            </button>
+            
+            <button 
+              className={styles.closeButton}
+              onClick={onClose}
+              aria-label="Закрыть"
+            >
+              &times;
+            </button>
+          </div>
         </div>
 
         <div className={styles.formContainer}>

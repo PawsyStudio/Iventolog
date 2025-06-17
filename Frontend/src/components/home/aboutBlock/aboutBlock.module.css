@@ -1,0 +1,120 @@
+.aboutBlock {
+  position: relative;
+  width: 100%;
+  height: 639px;
+  background-color: #071624;
+  overflow: hidden;
+}
+
+.aboutBlock::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background-color: #2f3c47;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  z-index: 0;
+}
+
+.down {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  pointer-events: none;
+  user-select: none;
+}
+
+.contentWrapper {
+  position: relative;
+  margin: 0 auto;
+  width: calc(100% - 54px);
+  max-width: 1200px;
+  z-index: 1;
+  margin-top: 122px; /* отступ сверху */
+}
+
+.frameImage {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.mainText {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: white;
+  line-height: 1.5;
+
+  white-space: normal;        /* разрешаем автоматические переносы */
+  word-break: break-word;     /* перенос слов при необходимости */
+  width: 100%;
+  max-width: 780px;           /* ограничение ширины для читаемости */
+  text-align: left;
+
+  margin: 0 0 20px;
+}
+
+.textContent {
+  position: absolute;
+  top: 60px;
+  left: calc(20px + 392px);
+  width: auto;
+  color: white;
+  overflow: visible;
+}
+
+.nameBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+}
+
+.name {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  margin: 0;
+}
+
+.position {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  color: #0081FF;
+  margin: 0;
+}
+
+.logoContainer {
+  position: absolute;
+  width: 265px;
+  height: 265px;
+  top: 50px;
+  left: 45px;
+  border-radius: 51px;
+  overflow: hidden; /* Важно! */
+}
+
+.teamLogo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* или contain, в зависимости от нужного эффекта */
+}
+
+.decorativeAboutUs {
+  position: absolute;
+  top: 69px;
+  left: 180px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #aeaeae;
+  font-family: 'Unbounded', sans-serif;
+  user-select: none;
+  z-index: 2;
+  pointer-events: none;
+}

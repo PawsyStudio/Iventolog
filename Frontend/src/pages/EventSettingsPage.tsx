@@ -1,12 +1,12 @@
+// EventSettingsPage.tsx
 import { useState } from 'react';
 import { useParams } from '@tanstack/react-router';
 import { useEvent } from '@/hooks/useEvent';
-import Header from '@/components/headPack/appHeader/AppHeader';
 import Footer from '@/components/footer/Footer';
-import LogoutButton from '@/components/logoutButton/LogoutButton';
 import { OverviewTab } from '@/components/eventSettings/OverviewTab';
 import { MenuAndBudgetTab } from '@/components/eventSettings/MenuAndBudgetTab';
 import { PollAndGuestsTab } from '@/components/eventSettings/PollAndGuestsTab';
+import { EventSettingsSidebar } from '@/components/eventSettings/EventSettingsSidebar';
 
 export function EventSettingsPage() {
   const { eventId } = useParams({ from: '/event/$eventId' });
@@ -18,72 +18,42 @@ export function EventSettingsPage() {
   if (!event) return <div>Мероприятие не найдено</div>;
 
   return (
-    <>
-      <Header />
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '0 2rem',
-        borderBottom: '1px solid #3498db',
-        backgroundColor: '#f8f9fa'
+    <div style={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      minHeight: '100vh',
+      backgroundColor: '#0d1822',
+    }}>
+      <div style={{ 
+        display: 'flex', 
+        flex: 1,
+        minHeight: 'calc(100vh - 100px)'
       }}>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <button
-            style={{
-              padding: '1rem 0',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: activeTab === 'overview' ? 'bold' : 'normal',
-              borderBottom: activeTab === 'overview' ? '3px solid #3498db' : 'none'
-            }}
-            onClick={() => setActiveTab('overview')}
-          >
-            Обзор
-          </button>
-          <button
-            style={{
-              padding: '1rem 0',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: activeTab === 'menu' ? 'bold' : 'normal',
-              borderBottom: activeTab === 'menu' ? '3px solid #3498db' : 'none'
-            }}
-            onClick={() => setActiveTab('menu')}
-          >
-            Меню и Бюджет
-          </button>
-          <button
-            style={{
-              padding: '1rem 0',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: activeTab === 'poll' ? 'bold' : 'normal',
-              borderBottom: activeTab === 'poll' ? '3px solid #3498db' : 'none'
-            }}
-            onClick={() => setActiveTab('poll')}
-          >
-            Опрос и Гости
-          </button>
+        <div style={{ 
+          width: '418px', 
+          flexShrink: 0,
+          backgroundColor: '#102131',
+        }}>
+          <EventSettingsSidebar 
+            eventTitle={event.title}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
         </div>
-        <LogoutButton />
+        
+        <div style={{ 
+          flex: 1,
+          padding: '2rem',
+          overflowY: 'auto',
+          backgroundColor: '#0d1822',
+        }}>
+          {activeTab === 'overview' && <OverviewTab event={event} />}
+          {activeTab === 'menu' && <MenuAndBudgetTab eventId={event.id} />}
+          {activeTab === 'poll' && <PollAndGuestsTab eventId={event.id} />}
+        </div>
       </div>
-
-      <div style={{
-        display: 'flex',
-        padding: '2rem',
-        gap: '2rem',
-        maxWidth: '1200px',
-        margin: '0 auto'
-      }}>
-        {activeTab === 'overview' && <OverviewTab event={event} />}
-        {activeTab === 'menu' && <MenuAndBudgetTab eventId={event.id} />}
-        {activeTab === 'poll' && <PollAndGuestsTab eventId={event.id} />}
-      </div>
+      
       <Footer />
-    </>
+    </div>
   );
 }

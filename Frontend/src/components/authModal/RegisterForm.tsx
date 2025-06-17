@@ -10,7 +10,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [telegramId, setTelegramId] = useState(''); // Добавили состояние для Telegram
+  const [telegramId, setTelegramId] = useState('');
   const [error, setError] = useState('');
   const login = useAuthStore(state => state.login);
 
@@ -30,7 +30,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
         body: JSON.stringify({ 
           email, 
           password,
-          telegram_id: telegramId // Добавили поле в запрос
+          telegram_id: telegramId
         }),
       });
 
@@ -52,8 +52,6 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className={styles.authForm}>
-      <h2>Регистрация</h2>
-      
       <div className={styles.formGroup}>
         <label>Email</label>
         <input
@@ -61,6 +59,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          placeholder="Введите ваш email"
         />
       </div>
 
@@ -84,6 +83,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
           onChange={(e) => setPassword(e.target.value)}
           required
           minLength={6}
+          placeholder="Создайте пароль"
         />
       </div>
 
@@ -94,6 +94,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
+          placeholder="Повторите пароль"
         />
       </div>
 

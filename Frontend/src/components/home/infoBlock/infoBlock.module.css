@@ -1,0 +1,181 @@
+.infoBlock {
+  position: relative;
+  width: 100%;
+  min-height: 865px;
+  background-color: #071624;
+  overflow: hidden;
+  padding-bottom: 100px;
+}
+
+.triangleBackground {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  background-color: #2f3c47;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+.svgFrame {
+  position: absolute;
+  top: 89px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.textWrapper {
+  position: absolute;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.textOne {
+  color: white;
+  margin-bottom: -5px;
+  font-size: 36px;
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 500;
+  margin-left: 70px;
+  align-self: flex-start;
+}
+
+.textTwo {
+  color: #1e90ff;
+  font-size: 36px;
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 500;
+  margin-right: 70px;
+  align-self: flex-end;
+}
+
+.decorativeLabel {
+  position: absolute;
+  top: 69px;
+  left: 180px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #005eb9;
+  font-family: 'Unbounded', sans-serif;
+  user-select: none;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.decorBlocksWrapper {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 300px;
+  z-index: 10;
+  position: relative;
+  padding: 0 20px;
+  flex-wrap: wrap;
+}
+
+.decorBlockItem {
+  width: 431px;
+  height: 540px;
+  border-radius: 29px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* ✅ Выравнивание текста по левому краю */
+  padding: 40px 30px;
+  box-sizing: border-box;
+  color: inherit;
+}
+
+/* Тени без блюра */
+.gradientBlock {
+  background: linear-gradient(180deg, #1E90FF 0%, #125699 100%);
+  color: white;
+  box-shadow: 15px 4px 0 #002F5C; /* ✅ Убрали блюр */
+}
+
+.whiteBlockFirst {
+  background-color: #ffffff;
+  color: #000000;
+  box-shadow: 15px 4px 0 #005EB9; /* ✅ Убрали блюр */
+}
+
+.whiteBlockSecond {
+  background-color: #ffffff;
+  color: #000000;
+  box-shadow: 15px 4px 0 #002F5C; /* ✅ Убрали блюр */
+}
+
+/* Текст */
+.textTop {
+  font-size: 36px;
+  font-weight: 300;
+  text-align: left; /* ✅ По левому краю */
+  margin-bottom: 190px;
+  width: 100%;
+  margin-top: 50px;
+}
+
+.textBottom {
+  font-size: 20px;
+  font-weight: 500;
+  text-align: left; /* ✅ По левому краю */
+  flex-grow: 1;
+  width: 100%;
+}
+
+.textTopBlue1 {
+  font-size: 36px;
+  font-weight: 300;
+  text-align: left; /* ✅ По левому краю */
+  margin-bottom: 190px;
+  color: #1E90FF;
+  width: 100%;
+  margin-top: 50px;
+}
+
+.textTopBlue2 {
+  font-size: 36px;
+  font-weight: 300;
+  text-align: left; /* ✅ По левому краю */
+  margin-bottom: 137px;
+  color: #1E90FF;
+  width: 100%;
+  margin-top: 50px;
+}
+
+.textBottomBlue {
+  font-size: 20px;
+  font-weight: 500;
+  text-align: left; /* ✅ По левому краю */
+  color: #1E90FF;
+  flex-grow: 1;
+  width: 100%;
+}
+
+/* Линия-разделитель — для первого блока (цвет по умолчанию) */
+.divider {
+  width: 100%;
+  height: 4px; /* Увеличена толщина */
+  background-color: currentColor;
+  margin: 0 auto 20px auto;
+  border-radius: 2px; /* Можно чуть увеличить радиус для плавности */
+}
+
+.dividerBlue {
+  width: 100%;           /* Немного уже, чтобы не прилегала вплотную к краям */
+  height: 5px;          /* Толще для лучшей видимости */
+  background-color: #1e90ff;
+  margin: 0 auto 25px auto; /* Центрируем, увеличиваем нижний отступ */
+  border-radius: 3px;
+  display: block;       /* Явный блочный элемент */
+  min-height: 5px;      /* Гарантируем высоту */
+}
+

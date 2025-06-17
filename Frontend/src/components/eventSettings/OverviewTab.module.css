@@ -1,72 +1,212 @@
+/* OverviewTab.module.css */
 .overview {
   display: flex;
-  gap: 2rem;
+  gap: 32px;
   width: 100%;
+  max-width: 1270px;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+  padding-top: 100px;
 }
 
 .summary, .params {
-  flex: 1;
-  padding: 1rem;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 30px;
+  background: #0054a7;
+  border-radius: 31px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
 
 .summary {
-  max-width: 40%;
+  width: 599px;
+  min-height: 508px;
+  display: flex;
+  flex-direction: column;
 }
 
 .params {
-  max-width: 60%;
+  width: 739px;
+  min-height: 508px;
+  display: flex;
+  flex-direction: column;
+}
+
+h2 {
+  color: white;
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 25px;
 }
 
 .list {
   list-style: none;
   padding: 0;
+  margin: 0;
+  flex-grow: 1;
 }
 
-.list li {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #eee;
+/* Стили для элементов списка в сводке */
+.summary .list li {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  min-height: 50px;
 }
 
-.descriptionBlock {
-  margin-top: 2rem;
-}
-
-.descriptionText {
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  min-height: 100px;
-  margin: 0.5rem 0;
-}
-
-.textarea {
+.summaryContainer {
+  display: flex;
+  align-items: center;
   width: 100%;
-  min-height: 150px;
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  margin: 0.5rem 0;
+  min-height: 50px;
 }
 
-.input {
-  width: 60px;
-  margin: 0 0.5rem;
-  padding: 0.25rem;
+.line {
+  height: 1px;
+  background: #5c92c7;
+  width: 100%;
+  margin-top: 10px;
 }
 
-.button {
-  margin-left: 0.5rem;
-  padding: 0.25rem 0.5rem;
-  background: #3498db;
+/* Стили для элементов списка в параметрах */
+.params .list li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  min-height: 50px;
+}
+
+.summaryLabel {
+  color: #95cbff;
+  font-weight: 700;
+  font-size: 16px;
+  flex: 1;
+}
+
+.summaryValue {
   color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  font-weight: 700;
+  font-size: 20px;
+  min-width: 150px;
+  text-align: right;
 }
 
-.button:hover {
-  background: #2980b9;
+.paramLabel {
+  color: white;
+  font-weight: 700;
+  font-size: 16px;
+  flex: 1;
+}
+
+.paramValue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 199px;
+  height: 40px;
+  background: #005eb9;
+  border-radius: 9px;
+  color: #9ec5ff;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 0 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.paramInput {
+  width: 199px;
+  height: 40px;
+  padding: 0 15px;
+  background: #005eb9;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 9px;
+  color: #9ec5ff;
+  font-size: 16px;
+  font-weight: 500;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.paramInput:focus {
+  outline: none;
+  border-color: #9ec5ff;
+}
+
+input.paramInput {
+  color: #9ec5ff !important;
+}
+
+select.paramInput {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ec5ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+.paramsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #5c92c7;
+}
+
+.editButton, .cancelButton, .submitButton {
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.editButton {
+  width: 199px;
+  height: 40px;
+  background: white;
+  color: #0054a7;
+  font-size: 15px;
+}
+
+.cancelButton {
+  width: 199px;
+  height: 49px;
+  background: #b40911;
+  color: #5c0102;
+  font-size: 16px;
+}
+
+.submitButton {
+  width: 199px;
+  height: 49px;
+  background: #2aff00;
+  color: #116600;
+  font-size: 16px;
+}
+
+.paramControls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 20px;
+  padding-left: 23.5px; /* Уменьшено на половину */
+  padding-right: 23.5px; /* Уменьшено на половину */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+::selection {
+  background: #007bff;
+  color: white;
+}
+
+::-moz-selection {
+  background: #007bff;
+  color: white;
 }

@@ -1,0 +1,12 @@
+.InfoScroll {
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16;
+    font-weight: 700;
+}
+
+.InfoScroll:hover {
+  color: #b6b8b9;
+}

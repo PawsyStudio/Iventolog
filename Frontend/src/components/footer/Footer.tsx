@@ -1,32 +1,43 @@
 import styles from './footer.module.css';
-import Logo1 from '../../assets/images/social/logoVK.svg'; // Путь к первому лого
-import Logo2 from '../../assets/images/social/logoTelegram.svg'; // Путь ко второму лого
-import Logo3 from '../../assets/images/social/logoWhatsApp.svg'; // Путь к третьему лого
+import MainLogo from '../../assets/images/logos/iventologFooter.svg';
+import LogoTelegram from '../../assets/images/social/logoTelegram.svg';
+import LogoWhatsApp from '../../assets/images/social/logoWhatsApp.svg';
+import LogoVK from '../../assets/images/social/logoVK.svg';
 
 export default function Footer() {
-    return (
-        <footer className={styles.footer}>
-            <div className={styles.socialBlock}>
-                <h3 className={styles.socialTitle}>КОНТАКТЫ</h3>
-                <a href="mailto:noname@noname.ru" className={styles.email}>noname@noname.ru</a>
-                <div className={styles.brandWithLogos}>
-                    <span className={styles.brandName}>Ивентолог</span>
-                    <div className={styles.logos}>
-                        <a href="https://vk.com" target="_blank" rel="noopener noreferrer">
-                         <img src={Logo1} alt="VK" className={styles.logo} />
-                        </a>
-                        <a href="https://telegram.org" target="_blank" rel="noopener noreferrer">
-                         <img src={Logo2} alt="Telegram" className={styles.logo} />
-                        </a>
-                        <a href="https://wa.me" target="_blank" rel="noopener noreferrer">
-                         <img src={Logo3} alt="WhatsApp" className={styles.logo} />
-                        </a>
-                    </div>
-                </div>
-            </div>
+  return (
+    <footer className={styles.footer}>
 
-            <a href="#" className={styles.link}>КАК ИСПОЛЬЗОВАТЬ</a>
-            <a href="#" className={styles.link}>ДОКУМЕНТЫ</a>
-        </footer>
-    )
+      {/* 1. Логотип */}
+      <div className={styles.logoBlock}>
+        <img src={MainLogo} alt="Ивентолог" className={styles.mainLogo} />
+      </div>
+
+      {/* 2. Социальные иконки в одну строку */}
+      <div className={styles.socialIconsBlock}>
+        <a href="https://telegram.org" target="_blank" rel="noopener noreferrer">
+          <img src={LogoTelegram} alt="Telegram" className={styles.socialIcon} />
+        </a>
+        <a href="https://wa.me" target="_blank" rel="noopener noreferrer">
+          <img src={LogoWhatsApp} alt="WhatsApp" className={styles.socialIcon} />
+        </a>
+        <a href="https://vk.com" target="_blank" rel="noopener noreferrer">
+          <img src={LogoVK} alt="VK" className={styles.socialIcon} />
+        </a>
+      </div>
+
+      {/* 3. Ссылки в столбец */}
+      <div className={styles.linksBlock}>
+        <a href="#" className={styles.link}>ДОКУМЕНТЫ</a>
+        <a href="#" className={styles.link}>КАК ИСПОЛЬЗОВАТЬ</a>
+      </div>
+
+      {/* 4. Контакты */}
+      <div className={styles.contactsBlock}>
+        <h3 className={styles.contactTitle}>КОНТАКТЫ</h3>
+        <a href="mailto:noname@noname.ru" className={styles.email}>noname@noname.ru</a>
+      </div>
+
+    </footer>
+  );
 }
