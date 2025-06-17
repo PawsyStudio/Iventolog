@@ -4,7 +4,6 @@ import { useAuthRedirect } from '@/hooks/useAuthRedirect';
 import InfoBlock from '@/components/home/infoBlock/infoBlock';
 import Header from '@/components/home/headPackHome/homeHeader/HomeHeader';
 import Footer from '@/components/footer/Footer';
-import LogoutButton from '@/components/logoutButton/LogoutButton';
 import DecorBlock from '@/components/home/decBlock/decorBlock';
 import AboutBlock from '@/components/home/aboutBlock/aboutBlock';
 import { AuthModal } from '@/components/authModal/AuthModal';
@@ -52,7 +51,6 @@ export function Home() {
         />
       </main>
       <Footer />
-      <LogoutButton />
     </>
   );
 }
